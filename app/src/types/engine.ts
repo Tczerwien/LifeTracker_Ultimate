@@ -96,6 +96,32 @@ export interface ValidationWarning {
 }
 
 // ---------------------------------------------------------------------------
+// Habit Validation
+// ---------------------------------------------------------------------------
+
+/** Input shape for habit validation — validates form data before full typing. */
+export interface HabitConfigInput {
+  display_name: string;
+  pool: 'good' | 'vice';
+  category: 'productivity' | 'health' | 'growth' | null;
+  input_type: 'checkbox' | 'dropdown' | 'number';
+  points: number;
+  penalty: number;
+  penalty_mode: 'flat' | 'per_instance' | 'tiered';
+  options_json: string | null;
+  sort_order: number;
+  is_active: 0 | 1;
+}
+
+/** Context for cross-entity validation rules (H18, H19, duplicate name). */
+export interface HabitValidationContext {
+  activeGoodHabitCount: number;
+  tieredViceCount: number;
+  isNew: boolean;
+  existingDisplayNames: string[];
+}
+
+// ---------------------------------------------------------------------------
 // Correlation
 // ---------------------------------------------------------------------------
 
