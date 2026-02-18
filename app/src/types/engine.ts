@@ -1,4 +1,5 @@
 import { HabitCategory, PenaltyMode } from './enums';
+import type { DailyLog } from './models';
 
 // ---------------------------------------------------------------------------
 // Scoring Engine I/O
@@ -55,11 +56,18 @@ export interface ScoringOutput {
 // Cascade
 // ---------------------------------------------------------------------------
 
-/** Output from cascade computation */
+/** Minimal daily-log row for cascade computation. Omits DB metadata fields. */
+export type DailyLogRow = Omit<DailyLog, 'id' | 'logged_at' | 'last_modified'>;
+
+/** Output from cascade computation — one entry per day that changed. */
 export interface CascadeUpdate {
   date: string;
   streak: number;
   finalScore: number;
+  /** Present only for the edited day (first element in the returned array) */
+  positiveScore?: number;
+  vicePenalty?: number;
+  baseScore?: number;
 }
 
 // ---------------------------------------------------------------------------
