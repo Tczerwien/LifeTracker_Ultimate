@@ -3,6 +3,7 @@ use std::sync::Mutex;
 use rusqlite::Connection;
 
 mod db;
+pub mod engine;
 
 pub struct AppState {
     pub db: Mutex<Connection>,
