@@ -1,4 +1,5 @@
 pub mod application;
+pub mod config;
 pub mod daily_log;
 pub mod journal;
 pub mod recovery;

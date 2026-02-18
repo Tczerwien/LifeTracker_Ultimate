@@ -60,6 +60,13 @@ pub fn run() {
             commands::recovery::get_urge_entries,
             commands::recovery::save_urge_entry,
             commands::recovery::update_urge_entry,
+            // Phase 6.6: Config & settings commands
+            commands::config::get_config,
+            commands::config::save_config,
+            commands::config::get_habit_configs,
+            commands::config::save_habit_config,
+            commands::config::retire_habit,
+            commands::config::reorder_habits,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
