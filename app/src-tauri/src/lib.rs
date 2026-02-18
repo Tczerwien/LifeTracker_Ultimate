@@ -36,6 +36,15 @@ pub fn run() {
             commands::daily_log::get_daily_logs,
             commands::daily_log::save_daily_log,
             commands::daily_log::get_streak_at_date,
+            // Phase 6.2: Journal commands
+            commands::journal::get_journal,
+            commands::journal::save_journal,
+            // Phase 6.3: Study session commands
+            commands::study::get_study_sessions,
+            commands::study::get_study_sessions_range,
+            commands::study::save_study_session,
+            commands::study::update_study_session,
+            commands::study::delete_study_session,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

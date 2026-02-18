@@ -1,4 +1,6 @@
 pub mod daily_log;
+pub mod journal;
+pub mod study;
 
 // ---------------------------------------------------------------------------
 // Shared Error Type for Tauri Commands
