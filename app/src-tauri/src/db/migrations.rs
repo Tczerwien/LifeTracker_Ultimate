@@ -51,11 +51,18 @@ pub fn run_migrations(conn: &mut Connection) -> Result<(), Box<dyn std::error::E
 /// Returns all migration definitions.
 /// Migrations are embedded at compile time via include_str!() for reliability.
 fn get_migrations() -> Vec<(i64, &'static str, &'static str)> {
-    vec![(
-        1,
-        "initial_schema",
-        include_str!("../../migrations/001_initial_schema.sql"),
-    )]
+    vec![
+        (
+            1,
+            "initial_schema",
+            include_str!("../../migrations/001_initial_schema.sql"),
+        ),
+        (
+            2,
+            "update_status_values",
+            include_str!("../../migrations/002_update_status_values.sql"),
+        ),
+    ]
 }
 
 #[cfg(test)]
@@ -289,7 +296,7 @@ mod tests {
 
         // Inserting status_change with non-existent application_id should fail
         let result = conn.execute(
-            "INSERT INTO status_change (application_id, status, date, notes, created_at) VALUES (9999, 'Applied', '2026-01-20', '', '2026-01-20T00:00:00Z')",
+            "INSERT INTO status_change (application_id, status, date, notes, created_at) VALUES (9999, 'applied', '2026-01-20', '', '2026-01-20T00:00:00Z')",
             [],
         );
 

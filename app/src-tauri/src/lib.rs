@@ -45,6 +45,14 @@ pub fn run() {
             commands::study::save_study_session,
             commands::study::update_study_session,
             commands::study::delete_study_session,
+            // Phase 6.4: Application commands
+            commands::application::get_applications,
+            commands::application::get_application,
+            commands::application::save_application,
+            commands::application::update_application,
+            commands::application::archive_application,
+            commands::application::add_status_change,
+            commands::application::get_status_history,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
