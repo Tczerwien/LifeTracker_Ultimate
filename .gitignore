@@ -1,0 +1,57 @@
+# ============================================
+# Git tracks ONLY: docs/ and .gitignore
+# Everything else is local dev tooling
+# ============================================
+
+# Ignore everything by default
+*
+
+# Allow these through
+!.gitignore
+!docs/
+!docs/**
+!app/
+!app/**
+
+# App build artifacts (re-ignore within app/)
+app/node_modules/
+app/dist/
+app/dist-ssr/
+app/build/
+app/coverage/
+app/src-tauri/target/
+app/src-tauri/WixTools/
+app/src-tauri/gen/
+
+# SQLite database files
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Environment & secrets
+.env
+.env.local
+.env.*.local
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+
+# Logs & coverage
+*.log
+npm-debug.log*
+*.lcov
+
+# Temporary files
+*.tmp
+*.bak
