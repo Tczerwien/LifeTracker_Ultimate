@@ -1,0 +1,2 @@
+-- Initial schema — full implementation in next prompt
+-- This placeholder allows the migration system to compile
