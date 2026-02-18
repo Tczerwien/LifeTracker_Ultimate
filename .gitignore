@@ -1,19 +1,26 @@
 # ============================================
-# Git tracks ONLY: docs/ and .gitignore
-# Everything else is local dev tooling
+# Deny-all, allowlist approach
+# Tracked: .gitignore, README.md, LICENSE,
+#          CLAUDE.md, docs/, app/
 # ============================================
 
 # Ignore everything by default
 *
 
-# Allow these through
+# Allow these root files through
 !.gitignore
+!README.md
+!LICENSE
+!LICENSE.*
+!CLAUDE.md
+
+# Allow project directories through
 !docs/
 !docs/**
 !app/
 !app/**
 
-# App build artifacts (re-ignore within app/)
+# Re-ignore build artifacts within app/
 app/node_modules/
 app/dist/
 app/dist-ssr/
