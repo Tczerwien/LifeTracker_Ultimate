@@ -2,6 +2,7 @@ use std::sync::Mutex;
 
 use rusqlite::Connection;
 
+mod commands;
 mod db;
 pub mod engine;
 
@@ -30,7 +31,12 @@ pub fn run() {
         .manage(AppState {
             db: Mutex::new(conn),
         })
-        .invoke_handler(tauri::generate_handler![])
+        .invoke_handler(tauri::generate_handler![
+            commands::daily_log::get_daily_log,
+            commands::daily_log::get_daily_logs,
+            commands::daily_log::save_daily_log,
+            commands::daily_log::get_streak_at_date,
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
