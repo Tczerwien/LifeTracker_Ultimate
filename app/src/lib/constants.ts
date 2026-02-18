@@ -1,31 +1,13 @@
 import { HabitCategory, ApplicationStatus } from '../types/enums';
+import type { AppConfig } from '../types/models';
 
 // ---------------------------------------------------------------------------
-// Default Config — temporary inline type until AppConfig is defined (Prompt 03)
+// Default Config — seed values from CONFIG_SCHEMA.md Section 3
 // ---------------------------------------------------------------------------
 
-/** Temporary interface matching app_config seed columns. Replaced by AppConfig in Prompt 03. */
-export interface DefaultConfig {
-  start_date: string;
-  multiplier_productivity: number;
-  multiplier_health: number;
-  multiplier_growth: number;
-  target_fraction: number;
-  vice_cap: number;
-  streak_threshold: number;
-  streak_bonus_per_day: number;
-  max_streak_bonus: number;
-  phone_t1_min: number;
-  phone_t2_min: number;
-  phone_t3_min: number;
-  phone_t1_penalty: number;
-  phone_t2_penalty: number;
-  phone_t3_penalty: number;
-  correlation_window_days: number;
-}
-
-/** Seed values from CONFIG_SCHEMA.md Section 3 */
-export const DEFAULT_CONFIG: Readonly<DefaultConfig> = {
+export const DEFAULT_CONFIG: Readonly<
+  Omit<AppConfig, 'id' | 'dropdown_options' | 'last_modified'>
+> = {
   start_date: '2026-01-20',
   multiplier_productivity: 1.5,
   multiplier_health: 1.3,
@@ -77,7 +59,7 @@ export const STREAK_GOLD = '#FFD700';
 // ---------------------------------------------------------------------------
 
 export const CATEGORY_MULTIPLIER_KEYS: Readonly<
-  Record<HabitCategory, keyof DefaultConfig>
+  Record<HabitCategory, keyof AppConfig>
 > = {
   [HabitCategory.Productivity]: 'multiplier_productivity',
   [HabitCategory.Health]: 'multiplier_health',
