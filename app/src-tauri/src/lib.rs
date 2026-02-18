@@ -53,6 +53,13 @@ pub fn run() {
             commands::application::archive_application,
             commands::application::add_status_change,
             commands::application::get_status_history,
+            // Phase 6.5: Recovery commands (relapse + urge)
+            commands::recovery::get_relapse_entries,
+            commands::recovery::save_relapse_entry,
+            commands::recovery::update_relapse_entry,
+            commands::recovery::get_urge_entries,
+            commands::recovery::save_urge_entry,
+            commands::recovery::update_urge_entry,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

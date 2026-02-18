@@ -1,6 +1,7 @@
 pub mod application;
 pub mod daily_log;
 pub mod journal;
+pub mod recovery;
 pub mod study;
 
 // ---------------------------------------------------------------------------
