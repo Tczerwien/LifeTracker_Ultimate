@@ -10,3 +10,5 @@ export {
 } from './scoring';
 
 export { computeCascade } from './cascade';
+
+export { computeCorrelations } from './correlation';
