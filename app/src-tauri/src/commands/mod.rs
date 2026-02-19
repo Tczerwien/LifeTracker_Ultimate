@@ -1,8 +1,12 @@
+pub mod analytics;
 pub mod application;
 pub mod config;
 pub mod daily_log;
+pub mod data;
 pub mod journal;
+pub mod milestone;
 pub mod recovery;
+pub mod review;
 pub mod study;
 
 // ---------------------------------------------------------------------------

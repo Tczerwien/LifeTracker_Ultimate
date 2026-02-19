@@ -119,7 +119,7 @@ struct HabitConfigRow {
 
 /// Column list used in all daily_log SELECT queries.
 /// Order must match positional indices in `row_to_daily_log`.
-const DAILY_LOG_COLUMNS: &str = "\
+pub const DAILY_LOG_COLUMNS: &str = "\
     id, date, \
     schoolwork, personal_project, classes, job_search, \
     gym, sleep_7_9h, wake_8am, supplements, meal_quality, stretching, \
@@ -134,7 +134,7 @@ const DAILY_LOG_COLUMNS: &str = "\
 
 /// Maps a rusqlite Row to a DailyLog struct using positional indices.
 /// Column order must match `DAILY_LOG_COLUMNS`.
-fn row_to_daily_log(row: &rusqlite::Row) -> rusqlite::Result<DailyLog> {
+pub fn row_to_daily_log(row: &rusqlite::Row) -> rusqlite::Result<DailyLog> {
     Ok(DailyLog {
         id: row.get(0)?,
         date: row.get(1)?,

@@ -67,6 +67,28 @@ pub fn run() {
             commands::config::save_habit_config,
             commands::config::retire_habit,
             commands::config::reorder_habits,
+            // Phase 6.7: Weekly review commands
+            commands::review::get_weekly_review,
+            commands::review::compute_weekly_stats,
+            commands::review::save_weekly_review,
+            // Phase 6.8: Analytics commands
+            commands::analytics::get_score_trend,
+            commands::analytics::get_habit_completion_rates,
+            commands::analytics::get_vice_frequency,
+            commands::analytics::get_day_of_week_averages,
+            commands::analytics::get_correlation_data,
+            commands::analytics::get_study_summary,
+            commands::analytics::get_application_pipeline,
+            commands::analytics::get_recovery_frequency,
+            // Phase 6.9: Milestone commands
+            commands::milestone::get_milestones,
+            commands::milestone::check_milestones,
+            // Phase 6.10: Data management commands
+            commands::data::export_data,
+            commands::data::import_data,
+            commands::data::get_db_stats,
+            commands::data::get_db_path,
+            commands::data::backup_now,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
