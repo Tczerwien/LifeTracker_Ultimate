@@ -8,8 +8,10 @@ describe('App', () => {
     expect(screen.getByText('Life Tracker Ultimate')).toBeInTheDocument();
   });
 
-  it('renders the default route (Daily Log)', () => {
+  it('renders the default route (Daily Log) with loading state', () => {
     render(<App />);
-    expect(screen.getByText('Daily Log', { selector: 'h1' })).toBeInTheDocument();
+    // DailyLogPage shows a loading skeleton while hooks are fetching
+    const skeleton = document.querySelector('.animate-pulse');
+    expect(skeleton).toBeInTheDocument();
   });
 });

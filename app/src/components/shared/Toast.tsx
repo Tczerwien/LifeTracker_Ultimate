@@ -12,7 +12,7 @@ import {
 // Types
 // ---------------------------------------------------------------------------
 
-type ToastVariant = 'success' | 'milestone';
+type ToastVariant = 'success' | 'error' | 'milestone';
 
 interface ToastMessage {
   id: number;
@@ -47,6 +47,7 @@ const DISMISS_MS = 3000;
 
 const VARIANT_STYLES: Record<ToastVariant, string> = {
   success: 'bg-green-600 text-white',
+  error: 'bg-red-600 text-white',
   milestone: 'bg-amber-500 text-white',
 };
 
