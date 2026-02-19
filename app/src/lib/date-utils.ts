@@ -53,3 +53,51 @@ export function compareDates(a: string, b: string): -1 | 0 | 1 {
   if (a > b) return 1;
   return 0;
 }
+
+/** Get the Monday (week start) of the week containing the given date. */
+export function getWeekStart(dateStr: string): string {
+  const date = parseYMD(dateStr);
+  const day = date.getDay();
+  // getDay(): 0=Sun, 1=Mon, ..., 6=Sat → offset to Monday
+  const diff = day === 0 ? -6 : 1 - day;
+  date.setDate(date.getDate() + diff);
+  return toYMD(date);
+}
+
+/** Get the Sunday (week end) from a Monday week-start date. */
+export function getWeekEnd(weekStart: string): string {
+  return addDays(weekStart, 6);
+}
+
+const weekRangeFormatter = new Intl.DateTimeFormat('en-US', {
+  month: 'short',
+  day: 'numeric',
+});
+
+const weekRangeYearFormatter = new Intl.DateTimeFormat('en-US', {
+  month: 'short',
+  day: 'numeric',
+  year: 'numeric',
+});
+
+/** Format a week range as "Feb 17 – Feb 23, 2026". */
+export function formatWeekRange(start: string, end: string): string {
+  const startDate = parseYMD(start);
+  const endDate = parseYMD(end);
+  const startStr = weekRangeFormatter.format(startDate);
+  const endStr = weekRangeYearFormatter.format(endDate);
+  return `${startStr} – ${endStr}`;
+}
+
+/**
+ * Compute duration in minutes from two HH:MM time strings.
+ * Handles midnight crossing (e.g. 23:00 → 01:00 = 120 min).
+ */
+export function computeDurationMinutes(startTime: string, endTime: string): number {
+  const [sh, sm] = startTime.split(':').map(Number) as [number, number];
+  const [eh, em] = endTime.split(':').map(Number) as [number, number];
+  const startMin = sh * 60 + sm;
+  const endMin = eh * 60 + em;
+  const diff = endMin - startMin;
+  return diff >= 0 ? diff : diff + 1440;
+}
