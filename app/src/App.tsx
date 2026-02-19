@@ -1,26 +1,39 @@
+import { QueryClientProvider } from '@tanstack/react-query';
+import { HashRouter, Routes, Route } from 'react-router-dom';
+import { queryClient } from './lib/query-client';
+import Sidebar from './components/shared/Sidebar';
+import DailyLogPage from './pages/DailyLogPage';
+import JournalPage from './pages/JournalPage';
+import AnalyticsPage from './pages/AnalyticsPage';
+import StudyLogPage from './pages/StudyLogPage';
+import AppLogPage from './pages/AppLogPage';
+import WeeklyReviewPage from './pages/WeeklyReviewPage';
+import SettingsPage from './pages/SettingsPage';
+import UrgeLogPage from './pages/UrgeLogPage';
+import RelapseLogPage from './pages/RelapseLogPage';
+
 function App() {
   return (
-    <div className="flex h-screen">
-      {/* Sidebar placeholder */}
-      <aside className="w-60 bg-surface-dark text-white p-component flex flex-col">
-        <h1 className="text-lg font-bold mb-section">Life Tracker Ultimate</h1>
-        <nav className="space-y-2">
-          <div className="text-sm text-gray-300">Daily Log</div>
-          <div className="text-sm text-gray-300">Journal</div>
-          <div className="text-sm text-gray-300">Analytics</div>
-        </nav>
-      </aside>
-
-      {/* Content area placeholder */}
-      <main className="flex-1 bg-white p-section">
-        <h2 className="text-xl font-semibold text-surface-dark">
-          Welcome to Life Tracker Ultimate
-        </h2>
-        <p className="mt-4 text-gray-600">
-          Phase 1 scaffold complete. Ready for Phase 2: Types & Constants.
-        </p>
-      </main>
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <HashRouter>
+        <div className="flex h-screen">
+          <Sidebar />
+          <main className="flex-1 overflow-y-auto bg-white">
+            <Routes>
+              <Route path="/" element={<DailyLogPage />} />
+              <Route path="/journal" element={<JournalPage />} />
+              <Route path="/analytics" element={<AnalyticsPage />} />
+              <Route path="/study" element={<StudyLogPage />} />
+              <Route path="/apps" element={<AppLogPage />} />
+              <Route path="/review" element={<WeeklyReviewPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/recovery/urge" element={<UrgeLogPage />} />
+              <Route path="/recovery/relapse" element={<RelapseLogPage />} />
+            </Routes>
+          </main>
+        </div>
+      </HashRouter>
+    </QueryClientProvider>
   );
 }
 
