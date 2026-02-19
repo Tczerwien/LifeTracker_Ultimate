@@ -1,0 +1,51 @@
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { invoke } from '@tauri-apps/api/core';
+import type { DbStats } from '../types/commands';
+import { QUERY_KEYS } from '../lib/query-keys';
+
+// ---------------------------------------------------------------------------
+// Queries
+// ---------------------------------------------------------------------------
+
+export function useDbStats() {
+  return useQuery({
+    queryKey: QUERY_KEYS.dbStats,
+    queryFn: () => invoke<DbStats>('get_db_stats'),
+  });
+}
+
+export function useDbPath() {
+  return useQuery({
+    queryKey: QUERY_KEYS.dbPath,
+    queryFn: () => invoke<string>('get_db_path'),
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Mutations
+// ---------------------------------------------------------------------------
+
+export function useExportData() {
+  return useMutation({
+    mutationFn: () => invoke<string>('export_data'),
+  });
+}
+
+export function useImportData() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (json: string) => invoke<void>('import_data', { json }),
+    onSuccess: () => {
+      // Import replaces all data — invalidate everything
+      void queryClient.invalidateQueries();
+    },
+  });
+}
+
+export function useBackupNow() {
+  return useMutation({
+    mutationFn: (destination: string) =>
+      invoke<string>('backup_now', { destination }),
+  });
+}
