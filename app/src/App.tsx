@@ -1,5 +1,5 @@
 import { QueryClientProvider } from '@tanstack/react-query';
-import { HashRouter, Routes, Route } from 'react-router-dom';
+import { createHashRouter, RouterProvider, Outlet } from 'react-router-dom';
 import { queryClient } from './lib/query-client';
 import { ToastProvider } from './components/shared/Toast';
 import Sidebar from './components/shared/Sidebar';
@@ -13,28 +13,39 @@ import SettingsPage from './pages/SettingsPage';
 import UrgeLogPage from './pages/UrgeLogPage';
 import RelapseLogPage from './pages/RelapseLogPage';
 
+function AppLayout() {
+  return (
+    <div className="flex h-screen">
+      <Sidebar />
+      <main className="flex-1 overflow-y-auto bg-white">
+        <Outlet />
+      </main>
+    </div>
+  );
+}
+
+const router = createHashRouter([
+  {
+    element: <AppLayout />,
+    children: [
+      { index: true, element: <DailyLogPage /> },
+      { path: 'journal', element: <JournalPage /> },
+      { path: 'analytics', element: <AnalyticsPage /> },
+      { path: 'study', element: <StudyLogPage /> },
+      { path: 'apps', element: <AppLogPage /> },
+      { path: 'review', element: <WeeklyReviewPage /> },
+      { path: 'settings', element: <SettingsPage /> },
+      { path: 'recovery/urge', element: <UrgeLogPage /> },
+      { path: 'recovery/relapse', element: <RelapseLogPage /> },
+    ],
+  },
+]);
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ToastProvider>
-      <HashRouter>
-        <div className="flex h-screen">
-          <Sidebar />
-          <main className="flex-1 overflow-y-auto bg-white">
-            <Routes>
-              <Route path="/" element={<DailyLogPage />} />
-              <Route path="/journal" element={<JournalPage />} />
-              <Route path="/analytics" element={<AnalyticsPage />} />
-              <Route path="/study" element={<StudyLogPage />} />
-              <Route path="/apps" element={<AppLogPage />} />
-              <Route path="/review" element={<WeeklyReviewPage />} />
-              <Route path="/settings" element={<SettingsPage />} />
-              <Route path="/recovery/urge" element={<UrgeLogPage />} />
-              <Route path="/recovery/relapse" element={<RelapseLogPage />} />
-            </Routes>
-          </main>
-        </div>
-      </HashRouter>
+        <RouterProvider router={router} />
       </ToastProvider>
     </QueryClientProvider>
   );
