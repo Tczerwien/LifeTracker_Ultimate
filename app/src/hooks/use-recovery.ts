@@ -37,6 +37,7 @@ export function useSaveRelapseEntry() {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: INVALIDATION_PREFIXES.relapseEntries });
       void queryClient.invalidateQueries({ queryKey: INVALIDATION_PREFIXES.recoveryFrequency });
+      void queryClient.invalidateQueries({ queryKey: INVALIDATION_PREFIXES.weeklyStats });
     },
   });
 }
@@ -50,6 +51,7 @@ export function useUpdateRelapseEntry() {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: INVALIDATION_PREFIXES.relapseEntries });
       void queryClient.invalidateQueries({ queryKey: INVALIDATION_PREFIXES.recoveryFrequency });
+      void queryClient.invalidateQueries({ queryKey: INVALIDATION_PREFIXES.weeklyStats });
     },
   });
 }
@@ -63,6 +65,7 @@ export function useSaveUrgeEntry() {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: INVALIDATION_PREFIXES.urgeEntries });
       void queryClient.invalidateQueries({ queryKey: INVALIDATION_PREFIXES.recoveryFrequency });
+      void queryClient.invalidateQueries({ queryKey: INVALIDATION_PREFIXES.weeklyStats });
     },
   });
 }
@@ -76,6 +79,7 @@ export function useUpdateUrgeEntry() {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: INVALIDATION_PREFIXES.urgeEntries });
       void queryClient.invalidateQueries({ queryKey: INVALIDATION_PREFIXES.recoveryFrequency });
+      void queryClient.invalidateQueries({ queryKey: INVALIDATION_PREFIXES.weeklyStats });
     },
   });
 }

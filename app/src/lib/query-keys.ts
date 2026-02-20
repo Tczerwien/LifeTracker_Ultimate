@@ -84,5 +84,6 @@ export const INVALIDATION_PREFIXES = {
   urgeEntries: ["urge-entries"] as const,
   recoveryFrequency: ["recovery-frequency"] as const,
   weeklyReview: ["weekly-review"] as const,
+  weeklyStats: ["weekly-stats"] as const,
   milestones: ["milestones"] as const,
 } as const;

@@ -5,6 +5,7 @@ interface JournalTextareaProps {
   placeholder?: string;
   value: string;
   onChange: (value: string) => void;
+  readOnly?: boolean;
 }
 
 export default function JournalTextarea({
@@ -12,6 +13,7 @@ export default function JournalTextarea({
   placeholder,
   value,
   onChange,
+  readOnly = false,
 }: JournalTextareaProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -37,11 +39,16 @@ export default function JournalTextarea({
         rows={3}
         placeholder={placeholder}
         value={value}
+        readOnly={readOnly}
         onChange={(e) => {
-          onChange(e.target.value);
-          adjustHeight();
+          if (!readOnly) {
+            onChange(e.target.value);
+            adjustHeight();
+          }
         }}
-        className="w-full resize-none rounded-md border-gray-300 text-body focus:border-productivity focus:ring-productivity"
+        className={`w-full resize-none rounded-md border-gray-300 text-body focus:border-productivity focus:ring-productivity${
+          readOnly ? ' bg-gray-50 cursor-not-allowed opacity-75' : ''
+        }`}
       />
     </div>
   );

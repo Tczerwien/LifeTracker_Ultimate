@@ -51,6 +51,7 @@ export function useSaveDailyLog() {
       void queryClient.invalidateQueries({ queryKey: INVALIDATION_PREFIXES.correlationData });
       void queryClient.invalidateQueries({ queryKey: INVALIDATION_PREFIXES.dayOfWeekAverages });
       void queryClient.invalidateQueries({ queryKey: INVALIDATION_PREFIXES.viceFrequency });
+      void queryClient.invalidateQueries({ queryKey: INVALIDATION_PREFIXES.weeklyStats });
     },
   });
 }

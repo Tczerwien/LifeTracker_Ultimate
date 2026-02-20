@@ -33,6 +33,7 @@ function useInvalidateStudy() {
   return () => {
     void queryClient.invalidateQueries({ queryKey: INVALIDATION_PREFIXES.studySessions });
     void queryClient.invalidateQueries({ queryKey: INVALIDATION_PREFIXES.studySummary });
+    void queryClient.invalidateQueries({ queryKey: INVALIDATION_PREFIXES.weeklyStats });
   };
 }
 

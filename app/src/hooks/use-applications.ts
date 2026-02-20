@@ -42,6 +42,7 @@ function useInvalidateApplications() {
   return () => {
     void queryClient.invalidateQueries({ queryKey: INVALIDATION_PREFIXES.applications });
     void queryClient.invalidateQueries({ queryKey: INVALIDATION_PREFIXES.applicationPipeline });
+    void queryClient.invalidateQueries({ queryKey: INVALIDATION_PREFIXES.weeklyStats });
   };
 }
 
@@ -85,6 +86,7 @@ export function useAddStatusChange() {
       void queryClient.invalidateQueries({ queryKey: INVALIDATION_PREFIXES.applications });
       void queryClient.invalidateQueries({ queryKey: INVALIDATION_PREFIXES.applicationPipeline });
       void queryClient.invalidateQueries({ queryKey: INVALIDATION_PREFIXES.statusHistory });
+      void queryClient.invalidateQueries({ queryKey: INVALIDATION_PREFIXES.weeklyStats });
     },
   });
 }
