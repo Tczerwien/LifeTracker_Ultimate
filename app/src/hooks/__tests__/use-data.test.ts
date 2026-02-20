@@ -59,11 +59,11 @@ describe('useExportData', () => {
 });
 
 describe('useImportData', () => {
-  it('invalidates ALL queries on success', async () => {
+  it('clears ALL query cache on success', async () => {
     mockInvoke.mockResolvedValueOnce(undefined);
 
     const queryClient = createTestQueryClient();
-    const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');
+    const clearSpy = vi.spyOn(queryClient, 'clear');
 
     const { result } = renderHook(() => useImportData(), {
       wrapper: createWrapper(queryClient),
@@ -73,8 +73,8 @@ describe('useImportData', () => {
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
     expect(mockInvoke).toHaveBeenCalledWith('import_data', { json: '{"_meta":{"schema_version":1}}' });
-    // Should invalidate ALL queries (called with no filter)
-    expect(invalidateSpy).toHaveBeenCalledWith();
+    // Should clear entire cache so page reload starts fresh
+    expect(clearSpy).toHaveBeenCalled();
   });
 });
 

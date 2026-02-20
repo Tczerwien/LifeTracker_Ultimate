@@ -37,8 +37,8 @@ export function useImportData() {
   return useMutation({
     mutationFn: (json: string) => invoke<void>('import_data', { json }),
     onSuccess: () => {
-      // Import replaces all data — invalidate everything
-      void queryClient.invalidateQueries();
+      // Import replaces all data — clear entire cache so reload starts fresh
+      queryClient.clear();
     },
   });
 }

@@ -211,11 +211,12 @@ fn export_data_impl(conn: &Connection) -> CommandResult<String> {
         row_counts.insert(table.to_string(), Value::Number(count.into()));
     }
 
-    // 2. Build _meta block
+    // 2. Build _meta block (ADR-001 SD2: self-describing for LLM analysis)
     let meta = serde_json::json!({
         "export_timestamp": chrono::Utc::now().to_rfc3339(),
         "schema_version": 1,
-        "row_counts": Value::Object(row_counts)
+        "row_counts": Value::Object(row_counts),
+        "description": "Life Tracker Ultimate data export. Tables: app_config (scoring parameters and settings), habit_config (habit/vice definitions with points and categories), daily_log (daily habit entries with computed scores), journal (daily mood/energy/reflection entries), study_session (academic study tracking), application (job applications), status_change (application pipeline history), urge_entry (urge resistance tracking), relapse_entry (relapse incidents), weekly_review (weekly reflection snapshots), milestone (achievement definitions and unlock state)."
     });
 
     // 3. Build export object with all tables
@@ -421,6 +422,7 @@ mod tests {
         assert!(meta.get("export_timestamp").is_some());
         assert_eq!(meta.get("schema_version").unwrap().as_i64().unwrap(), 1);
         assert!(meta.get("row_counts").is_some());
+        assert!(meta.get("description").is_some(), "_meta should include description (ADR-001 SD2)");
     }
 
     #[test]

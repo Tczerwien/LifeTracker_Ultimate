@@ -46,7 +46,7 @@ function formatBytes(bytes: number): string {
 interface ImportPreview {
   json: string;
   meta: Record<string, unknown> | null;
-  tables: { name: string; count: number }[];
+  tables: { name: string; importCount: number; currentCount: number }[];
 }
 
 export default function DataTab({ dbStats, dbPath, config }: DataTabProps) {
@@ -82,7 +82,7 @@ export default function DataTab({ dbStats, dbPath, config }: DataTabProps) {
       setBusy(true);
       const savePath = await save({
         title: 'Export Data',
-        defaultPath: `ltu-export-${new Date().toISOString().slice(0, 10)}.json`,
+        defaultPath: `ltu_export_${new Date().toISOString().slice(0, 10)}.json`,
         filters: [{ name: 'JSON', extensions: ['json'] }],
       });
 
@@ -93,7 +93,7 @@ export default function DataTab({ dbStats, dbPath, config }: DataTabProps) {
 
       const jsonData = await exportMutation.mutateAsync();
       await writeTextFile(savePath, jsonData);
-      show('Data exported successfully', 'success');
+      show(`Exported to ${savePath}`, 'success');
     } catch (err) {
       show(
         `Export failed: ${err instanceof Error ? err.message : String(err)}`,
@@ -130,12 +130,18 @@ export default function DataTab({ dbStats, dbPath, config }: DataTabProps) {
           ? (parsed['_meta'] as Record<string, unknown>)
           : null;
 
-      const tables: { name: string; count: number }[] = [];
+      const tables: { name: string; importCount: number; currentCount: number }[] = [];
       for (const [key, value] of Object.entries(parsed)) {
         if (key === '_meta') continue;
-        if (Array.isArray(value)) {
-          tables.push({ name: key, count: value.length });
-        }
+        const importCount = Array.isArray(value)
+          ? value.length
+          : typeof value === 'object' && value !== null
+            ? 1
+            : 0;
+        if (importCount === 0) continue;
+        const currentCount =
+          dbStats?.table_counts.find((t) => t.table_name === key)?.count ?? 0;
+        tables.push({ name: key, importCount, currentCount });
       }
 
       setImportPreview({ json: content, meta, tables });
@@ -148,16 +154,20 @@ export default function DataTab({ dbStats, dbPath, config }: DataTabProps) {
     } finally {
       setBusy(false);
     }
-  }, [show]);
+  }, [show, dbStats]);
 
   const handleConfirmImport = useCallback(async () => {
     if (!importPreview) return;
     try {
       setBusy(true);
       await importMutation.mutateAsync(importPreview.json);
-      show('Data imported successfully', 'success');
+      show('Data imported successfully — reloading...', 'success');
       setImportPreview(null);
       setImportConfirmOpen(false);
+      // Reload to ensure all components re-mount with fresh data
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     } catch (err) {
       show(
         `Import failed: ${err instanceof Error ? err.message : String(err)}`,
@@ -175,7 +185,7 @@ export default function DataTab({ dbStats, dbPath, config }: DataTabProps) {
       setBusy(true);
       const savePath = await save({
         title: 'Backup Database',
-        defaultPath: `ltu-backup-${new Date().toISOString().slice(0, 10)}.db`,
+        defaultPath: `ltu_backup_${new Date().toISOString().slice(0, 10)}.db`,
         filters: [{ name: 'SQLite Database', extensions: ['db'] }],
       });
 
@@ -184,8 +194,9 @@ export default function DataTab({ dbStats, dbPath, config }: DataTabProps) {
         return;
       }
 
-      await backupMutation.mutateAsync(savePath);
-      show('Backup saved successfully', 'success');
+      const dest = await backupMutation.mutateAsync(savePath);
+      const sizeStr = dbStats ? formatBytes(dbStats.file_size_bytes) : '';
+      show(`Backup saved to ${dest}${sizeStr ? ` (${sizeStr})` : ''}`, 'success');
     } catch (err) {
       show(
         `Backup failed: ${err instanceof Error ? err.message : String(err)}`,
@@ -194,7 +205,7 @@ export default function DataTab({ dbStats, dbPath, config }: DataTabProps) {
     } finally {
       setBusy(false);
     }
-  }, [backupMutation, show]);
+  }, [backupMutation, dbStats, show]);
 
   // ── Dropdown list management ──────────────────────────────────────────
 
@@ -413,7 +424,7 @@ export default function DataTab({ dbStats, dbPath, config }: DataTabProps) {
         <ConfirmDialog
           open={importConfirmOpen}
           title="Confirm Import"
-          message={`This will overwrite ALL current data with the imported file. This cannot be undone.\n\nRecords to import:\n${importPreview.tables.map((t) => `  ${t.name}: ${t.count}`).join('\n')}`}
+          message={`This will overwrite ALL current data. This cannot be undone.\n\n${importPreview.tables.map((t) => `${t.name}: ${t.currentCount} → ${t.importCount}`).join('\n')}`}
           confirmLabel="Import"
           variant="danger"
           onConfirm={() => void handleConfirmImport()}
