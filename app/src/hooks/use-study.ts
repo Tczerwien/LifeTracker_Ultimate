@@ -3,6 +3,7 @@ import { invoke } from '@tauri-apps/api/core';
 import type { StudySession } from '../types/models';
 import type { StudySessionInput } from '../types/commands';
 import { QUERY_KEYS, INVALIDATION_PREFIXES } from '../lib/query-keys';
+import { useMilestoneChecker } from './use-milestones';
 
 // ---------------------------------------------------------------------------
 // Queries
@@ -30,10 +31,13 @@ export function useStudySessionsRange(start: string, end: string) {
 
 function useInvalidateStudy() {
   const queryClient = useQueryClient();
+  const checkMilestones = useMilestoneChecker();
   return () => {
     void queryClient.invalidateQueries({ queryKey: INVALIDATION_PREFIXES.studySessions });
     void queryClient.invalidateQueries({ queryKey: INVALIDATION_PREFIXES.studySummary });
     void queryClient.invalidateQueries({ queryKey: INVALIDATION_PREFIXES.weeklyStats });
+    // Phase 16: check milestones after save (RD7 post-save side effect)
+    void checkMilestones();
   };
 }
 

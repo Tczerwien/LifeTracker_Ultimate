@@ -84,6 +84,7 @@ pub fn run() {
             // Phase 6.9: Milestone commands
             commands::milestone::get_milestones,
             commands::milestone::check_milestones,
+            commands::milestone::get_milestone_context,
             // Phase 6.10: Data management commands
             commands::data::export_data,
             commands::data::import_data,

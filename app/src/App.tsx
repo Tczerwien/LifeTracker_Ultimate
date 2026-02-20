@@ -10,6 +10,7 @@ import StudyLogPage from './pages/StudyLogPage';
 import AppLogPage from './pages/AppLogPage';
 import WeeklyReviewPage from './pages/WeeklyReviewPage';
 import SettingsPage from './pages/SettingsPage';
+import MilestonePage from './pages/MilestonePage';
 import UrgeLogPage from './pages/UrgeLogPage';
 import RelapseLogPage from './pages/RelapseLogPage';
 
@@ -34,6 +35,7 @@ const router = createHashRouter([
       { path: 'study', element: <StudyLogPage /> },
       { path: 'apps', element: <AppLogPage /> },
       { path: 'review', element: <WeeklyReviewPage /> },
+      { path: 'milestones', element: <MilestonePage /> },
       { path: 'settings', element: <SettingsPage /> },
       { path: 'recovery/urge', element: <UrgeLogPage /> },
       { path: 'recovery/relapse', element: <RelapseLogPage /> },

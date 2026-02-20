@@ -1,5 +1,6 @@
 import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ToastProvider } from '../../components/shared/Toast';
 
 /** Create a fresh QueryClient for testing — disables retries and stale time. */
 export function createTestQueryClient() {
@@ -16,7 +17,9 @@ export function createWrapper(queryClient?: QueryClient) {
   const client = queryClient ?? createTestQueryClient();
   return function Wrapper({ children }: { children: React.ReactNode }) {
     return (
-      <QueryClientProvider client={client}>{children}</QueryClientProvider>
+      <QueryClientProvider client={client}>
+        <ToastProvider>{children}</ToastProvider>
+      </QueryClientProvider>
     );
   };
 }

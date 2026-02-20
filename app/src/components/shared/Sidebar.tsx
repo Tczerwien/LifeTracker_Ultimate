@@ -16,6 +16,7 @@ const SECONDARY_NAV: readonly NavItem[] = [
   { label: 'Study Log', to: '/study' },
   { label: 'App Log', to: '/apps' },
   { label: 'Weekly Review', to: '/review' },
+  { label: 'Milestones', to: '/milestones' },
   { label: 'Settings', to: '/settings' },
 ];
 

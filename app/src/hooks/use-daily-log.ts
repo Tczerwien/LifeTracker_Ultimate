@@ -3,6 +3,7 @@ import { invoke } from '@tauri-apps/api/core';
 import type { DailyLog } from '../types/models';
 import type { DailyLogInput } from '../types/commands';
 import { QUERY_KEYS, INVALIDATION_PREFIXES } from '../lib/query-keys';
+import { useMilestoneChecker } from './use-milestones';
 
 // ---------------------------------------------------------------------------
 // Queries
@@ -38,6 +39,7 @@ export function useStreakAtDate(date: string) {
 
 export function useSaveDailyLog() {
   const queryClient = useQueryClient();
+  const checkMilestones = useMilestoneChecker();
 
   return useMutation({
     mutationFn: (entry: DailyLogInput) =>
@@ -52,6 +54,8 @@ export function useSaveDailyLog() {
       void queryClient.invalidateQueries({ queryKey: INVALIDATION_PREFIXES.dayOfWeekAverages });
       void queryClient.invalidateQueries({ queryKey: INVALIDATION_PREFIXES.viceFrequency });
       void queryClient.invalidateQueries({ queryKey: INVALIDATION_PREFIXES.weeklyStats });
+      // Phase 16: check milestones after save (RD7 post-save side effect)
+      void checkMilestones();
     },
   });
 }

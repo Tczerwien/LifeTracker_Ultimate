@@ -3,6 +3,7 @@ import { invoke } from '@tauri-apps/api/core';
 import type { WeeklyReview } from '../types/models';
 import type { WeeklyReviewInput, WeeklyStats } from '../types/commands';
 import { QUERY_KEYS, INVALIDATION_PREFIXES } from '../lib/query-keys';
+import { useMilestoneChecker } from './use-milestones';
 
 // ---------------------------------------------------------------------------
 // Queries
@@ -30,12 +31,15 @@ export function useWeeklyStats(weekStart: string) {
 
 export function useSaveWeeklyReview() {
   const queryClient = useQueryClient();
+  const checkMilestones = useMilestoneChecker();
 
   return useMutation({
     mutationFn: (review: WeeklyReviewInput) =>
       invoke<WeeklyReview>('save_weekly_review', { review }),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: INVALIDATION_PREFIXES.weeklyReview });
+      // Phase 16: check milestones after save (RD7 post-save side effect)
+      void checkMilestones();
     },
   });
 }

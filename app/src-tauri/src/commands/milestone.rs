@@ -1,4 +1,4 @@
-use rusqlite::{params, Connection};
+use rusqlite::{params, Connection, OptionalExtension};
 use serde::{Deserialize, Serialize};
 
 use crate::AppState;
@@ -167,8 +167,133 @@ fn check_milestones_impl(
 }
 
 // ---------------------------------------------------------------------------
+// Milestone Context Builder
+// ---------------------------------------------------------------------------
+
+/// Count consecutive clean days walking backwards from the most recent daily_log.
+/// A clean day: porn = 0 AND masturbate = 0.
+/// Streak breaks on: a day with porn > 0 OR masturbate > 0, OR a gap in dates.
+fn compute_consecutive_clean_days(conn: &Connection) -> CommandResult<i64> {
+    let mut stmt = conn.prepare(
+        "SELECT date, porn, masturbate FROM daily_log ORDER BY date DESC",
+    )?;
+    let rows: Vec<(String, i64, i64)> = stmt
+        .query_map([], |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)))?
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(CommandError::from)?;
+
+    if rows.is_empty() {
+        return Ok(0);
+    }
+
+    let mut count: i64 = 0;
+    let mut expected_date: Option<String> = None;
+
+    for (date, porn, masturbate) in &rows {
+        // Check date continuity
+        if let Some(ref exp) = expected_date {
+            if date != exp {
+                break; // Gap in dates breaks the streak
+            }
+        }
+        // Check if clean
+        if *porn > 0 || *masturbate > 0 {
+            break;
+        }
+        count += 1;
+        // Compute previous day using SQLite date arithmetic
+        let prev: String = conn
+            .query_row("SELECT date(?1, '-1 day')", params![date], |row| row.get(0))
+            .map_err(CommandError::from)?;
+        expected_date = Some(prev);
+    }
+
+    Ok(count)
+}
+
+/// Compute all 8 MilestoneContext fields from the database in one call.
+fn get_milestone_context_impl(conn: &Connection) -> CommandResult<MilestoneContext> {
+    // 1. current_streak: from most recent scored daily_log
+    let current_streak: i64 = conn
+        .query_row(
+            "SELECT COALESCE(streak, 0) FROM daily_log \
+             WHERE final_score IS NOT NULL \
+             ORDER BY date DESC LIMIT 1",
+            [],
+            |row| row.get(0),
+        )
+        .optional()?
+        .unwrap_or(0);
+
+    // 2. total_days_tracked
+    let total_days_tracked: i64 =
+        conn.query_row("SELECT COUNT(*) FROM daily_log", [], |row| row.get(0))?;
+
+    // 3. total_study_hours (stored as duration_minutes in study_session)
+    let total_study_hours: f64 = conn.query_row(
+        "SELECT COALESCE(SUM(duration_minutes), 0) / 60.0 FROM study_session",
+        [],
+        |row| row.get(0),
+    )?;
+
+    // 4. total_applications
+    let total_applications: i64 =
+        conn.query_row("SELECT COUNT(*) FROM application", [], |row| row.get(0))?;
+
+    // 5. consecutive_clean_days
+    let consecutive_clean_days = compute_consecutive_clean_days(conn)?;
+
+    // 6. highest_score
+    let highest_score: f64 = conn.query_row(
+        "SELECT COALESCE(MAX(final_score), 0.0) FROM daily_log",
+        [],
+        |row| row.get(0),
+    )?;
+
+    // 7. avg_score_7d: average of last 7 scored days
+    let avg_score_7d: f64 = conn.query_row(
+        "SELECT COALESCE(AVG(final_score), 0.0) FROM ( \
+             SELECT final_score FROM daily_log \
+             WHERE final_score IS NOT NULL \
+             ORDER BY date DESC LIMIT 7 \
+         )",
+        [],
+        |row| row.get(0),
+    )?;
+
+    // 8. high_focus_sessions: study sessions with focus_score >= 4
+    let high_focus_sessions: i64 = conn.query_row(
+        "SELECT COUNT(*) FROM study_session WHERE focus_score >= 4",
+        [],
+        |row| row.get(0),
+    )?;
+
+    Ok(MilestoneContext {
+        current_streak,
+        total_days_tracked,
+        total_study_hours,
+        total_applications,
+        consecutive_clean_days,
+        highest_score,
+        avg_score_7d,
+        high_focus_sessions,
+    })
+}
+
+// ---------------------------------------------------------------------------
 // Tauri Commands
 // ---------------------------------------------------------------------------
+
+#[tauri::command]
+pub fn get_milestone_context(
+    state: tauri::State<'_, AppState>,
+) -> CommandResult<MilestoneContext> {
+    let db = state
+        .db
+        .lock()
+        .map_err(|_| CommandError::from("DB lock poisoned"))?;
+    get_milestone_context_impl(&db)
+}
 
 #[tauri::command]
 pub fn get_milestones(
@@ -378,5 +503,221 @@ mod tests {
         assert!(ids.contains(&"first_steps")); // tracking
         assert!(ids.contains(&"clean_1")); // clean
         assert!(ids.contains(&"first_session")); // study
+    }
+
+    // -----------------------------------------------------------------------
+    // C. get_milestone_context tests
+    // -----------------------------------------------------------------------
+
+    /// Insert a minimal daily_log row for milestone context tests.
+    fn insert_daily_log(
+        conn: &Connection,
+        date: &str,
+        streak: i64,
+        final_score: f64,
+        porn: i64,
+        masturbate: i64,
+    ) {
+        let now = "2026-01-20T00:00:00Z";
+        conn.execute(
+            "INSERT INTO daily_log (\
+             date, schoolwork, personal_project, classes, job_search, \
+             gym, sleep_7_9h, wake_8am, supplements, meal_quality, stretching, \
+             meditate, \"read\", social, \
+             porn, masturbate, weed, skip_class, binged_content, gaming_1h, \
+             past_12am, late_wake, phone_use, \
+             positive_score, vice_penalty, base_score, streak, final_score, \
+             logged_at, last_modified\
+             ) VALUES (\
+             ?1, 0, 0, 0, 0, 0, 0, 0, 0, 'None', 0, 0, 0, 'None', \
+             ?4, ?5, 0, 0, 0, 0, 0, 0, 0, \
+             50.0, 0.0, 50.0, ?2, ?3, ?6, ?7)",
+            params![date, streak, final_score, porn, masturbate, now, now],
+        )
+        .unwrap();
+    }
+
+    fn insert_study_session(
+        conn: &Connection,
+        date: &str,
+        duration_min: i64,
+        focus: i64,
+    ) {
+        let now = "2026-01-20T00:00:00Z";
+        conn.execute(
+            "INSERT INTO study_session (\
+             date, subject, study_type, start_time, end_time, \
+             duration_minutes, focus_score, location, topic, resources, notes, \
+             logged_at, last_modified\
+             ) VALUES (?1, 'Math', 'Self-Study', '09:00', '11:00', \
+             ?2, ?3, 'Library', '', '', '', ?4, ?5)",
+            params![date, duration_min, focus, now, now],
+        )
+        .unwrap();
+    }
+
+    fn insert_application(conn: &Connection, date: &str) {
+        let now = "2026-01-20T00:00:00Z";
+        conn.execute(
+            "INSERT INTO application (\
+             date_applied, company, role, source, current_status, \
+             url, notes, salary, contact_name, contact_email, \
+             login_username, login_password, archived, logged_at, last_modified\
+             ) VALUES (?1, 'TestCo', 'Dev', 'LinkedIn', 'applied', \
+             '', '', '', '', '', '', '', 0, ?2, ?3)",
+            params![date, now, now],
+        )
+        .unwrap();
+    }
+
+    #[test]
+    fn test_get_milestone_context_empty_db() {
+        let conn = setup_test_db();
+        let ctx = get_milestone_context_impl(&conn).unwrap();
+        assert_eq!(ctx.current_streak, 0);
+        assert_eq!(ctx.total_days_tracked, 0);
+        assert!((ctx.total_study_hours - 0.0).abs() < f64::EPSILON);
+        assert_eq!(ctx.total_applications, 0);
+        assert_eq!(ctx.consecutive_clean_days, 0);
+        assert!((ctx.highest_score - 0.0).abs() < f64::EPSILON);
+        assert!((ctx.avg_score_7d - 0.0).abs() < f64::EPSILON);
+        assert_eq!(ctx.high_focus_sessions, 0);
+    }
+
+    #[test]
+    fn test_get_milestone_context_total_days_tracked() {
+        let conn = setup_test_db();
+        insert_daily_log(&conn, "2026-01-01", 1, 80.0, 0, 0);
+        insert_daily_log(&conn, "2026-01-02", 2, 85.0, 0, 0);
+        insert_daily_log(&conn, "2026-01-03", 3, 90.0, 0, 0);
+
+        let ctx = get_milestone_context_impl(&conn).unwrap();
+        assert_eq!(ctx.total_days_tracked, 3);
+    }
+
+    #[test]
+    fn test_get_milestone_context_current_streak() {
+        let conn = setup_test_db();
+        insert_daily_log(&conn, "2026-01-01", 1, 70.0, 0, 0);
+        insert_daily_log(&conn, "2026-01-02", 2, 75.0, 0, 0);
+        insert_daily_log(&conn, "2026-01-03", 3, 80.0, 0, 0);
+
+        let ctx = get_milestone_context_impl(&conn).unwrap();
+        // Most recent by date DESC is 2026-01-03 with streak = 3
+        assert_eq!(ctx.current_streak, 3);
+    }
+
+    #[test]
+    fn test_get_milestone_context_study_hours() {
+        let conn = setup_test_db();
+        // 120 + 60 = 180 minutes = 3.0 hours
+        insert_study_session(&conn, "2026-01-01", 120, 3);
+        insert_study_session(&conn, "2026-01-02", 60, 5);
+
+        let ctx = get_milestone_context_impl(&conn).unwrap();
+        assert!((ctx.total_study_hours - 3.0).abs() < 0.001);
+    }
+
+    #[test]
+    fn test_get_milestone_context_applications() {
+        let conn = setup_test_db();
+        insert_application(&conn, "2026-01-01");
+        insert_application(&conn, "2026-01-02");
+
+        let ctx = get_milestone_context_impl(&conn).unwrap();
+        assert_eq!(ctx.total_applications, 2);
+    }
+
+    #[test]
+    fn test_get_milestone_context_consecutive_clean_days() {
+        let conn = setup_test_db();
+        // 5 consecutive clean days
+        insert_daily_log(&conn, "2026-01-01", 1, 80.0, 0, 0);
+        insert_daily_log(&conn, "2026-01-02", 2, 80.0, 0, 0);
+        insert_daily_log(&conn, "2026-01-03", 3, 80.0, 0, 0);
+        insert_daily_log(&conn, "2026-01-04", 4, 80.0, 0, 0);
+        insert_daily_log(&conn, "2026-01-05", 5, 80.0, 0, 0);
+
+        let ctx = get_milestone_context_impl(&conn).unwrap();
+        assert_eq!(ctx.consecutive_clean_days, 5);
+    }
+
+    #[test]
+    fn test_get_milestone_context_clean_days_breaks_on_vice() {
+        let conn = setup_test_db();
+        // 3 clean, then 1 with porn, then 2 more clean
+        insert_daily_log(&conn, "2026-01-01", 1, 80.0, 0, 0);
+        insert_daily_log(&conn, "2026-01-02", 2, 80.0, 0, 0);
+        insert_daily_log(&conn, "2026-01-03", 3, 80.0, 1, 0); // vice!
+        insert_daily_log(&conn, "2026-01-04", 1, 80.0, 0, 0);
+        insert_daily_log(&conn, "2026-01-05", 2, 80.0, 0, 0);
+
+        let ctx = get_milestone_context_impl(&conn).unwrap();
+        // Walking from most recent (01-05): clean, clean, then 01-03 has porn=1 → breaks
+        assert_eq!(ctx.consecutive_clean_days, 2);
+    }
+
+    #[test]
+    fn test_get_milestone_context_clean_days_breaks_on_gap() {
+        let conn = setup_test_db();
+        // 3 consecutive clean days, then a gap, then another clean day
+        insert_daily_log(&conn, "2026-01-01", 1, 80.0, 0, 0);
+        // gap: 2026-01-02 missing
+        insert_daily_log(&conn, "2026-01-03", 1, 80.0, 0, 0);
+        insert_daily_log(&conn, "2026-01-04", 2, 80.0, 0, 0);
+        insert_daily_log(&conn, "2026-01-05", 3, 80.0, 0, 0);
+
+        let ctx = get_milestone_context_impl(&conn).unwrap();
+        // Walking from 01-05: clean. 01-04: clean. 01-03: clean. Expected prev = 01-02 but missing → gap
+        assert_eq!(ctx.consecutive_clean_days, 3);
+    }
+
+    #[test]
+    fn test_get_milestone_context_clean_days_breaks_on_masturbate() {
+        let conn = setup_test_db();
+        insert_daily_log(&conn, "2026-01-01", 1, 80.0, 0, 0);
+        insert_daily_log(&conn, "2026-01-02", 2, 80.0, 0, 1); // masturbate!
+        insert_daily_log(&conn, "2026-01-03", 1, 80.0, 0, 0);
+
+        let ctx = get_milestone_context_impl(&conn).unwrap();
+        // Walking from 01-03: clean. 01-02: masturbate=1 → breaks
+        assert_eq!(ctx.consecutive_clean_days, 1);
+    }
+
+    #[test]
+    fn test_get_milestone_context_highest_score() {
+        let conn = setup_test_db();
+        insert_daily_log(&conn, "2026-01-01", 1, 60.0, 0, 0);
+        insert_daily_log(&conn, "2026-01-02", 2, 95.0, 0, 0);
+        insert_daily_log(&conn, "2026-01-03", 3, 70.0, 0, 0);
+
+        let ctx = get_milestone_context_impl(&conn).unwrap();
+        assert!((ctx.highest_score - 95.0).abs() < 0.001);
+    }
+
+    #[test]
+    fn test_get_milestone_context_avg_score_7d() {
+        let conn = setup_test_db();
+        // Insert 10 days — avg should be over the last 7 (days 4–10)
+        for i in 1..=10 {
+            let date = format!("2026-01-{:02}", i);
+            insert_daily_log(&conn, &date, i, (70 + i) as f64, 0, 0);
+        }
+
+        let ctx = get_milestone_context_impl(&conn).unwrap();
+        // Last 7 by date DESC: 80, 79, 78, 77, 76, 75, 74 → avg = 77.0
+        assert!((ctx.avg_score_7d - 77.0).abs() < 0.001);
+    }
+
+    #[test]
+    fn test_get_milestone_context_high_focus_sessions() {
+        let conn = setup_test_db();
+        insert_study_session(&conn, "2026-01-01", 60, 3); // not high focus
+        insert_study_session(&conn, "2026-01-02", 90, 4); // high focus
+        insert_study_session(&conn, "2026-01-03", 45, 5); // high focus
+        insert_study_session(&conn, "2026-01-04", 30, 2); // not high focus
+
+        let ctx = get_milestone_context_impl(&conn).unwrap();
+        assert_eq!(ctx.high_focus_sessions, 2);
     }
 }

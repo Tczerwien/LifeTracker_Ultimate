@@ -3,6 +3,7 @@ import { invoke } from '@tauri-apps/api/core';
 import type { Application, StatusChange } from '../types/models';
 import type { ApplicationInput, AppFilters, StatusChangeInput } from '../types/commands';
 import { QUERY_KEYS, INVALIDATION_PREFIXES } from '../lib/query-keys';
+import { useMilestoneChecker } from './use-milestones';
 
 // ---------------------------------------------------------------------------
 // Queries
@@ -39,10 +40,13 @@ export function useStatusHistory(appId: number) {
 
 function useInvalidateApplications() {
   const queryClient = useQueryClient();
+  const checkMilestones = useMilestoneChecker();
   return () => {
     void queryClient.invalidateQueries({ queryKey: INVALIDATION_PREFIXES.applications });
     void queryClient.invalidateQueries({ queryKey: INVALIDATION_PREFIXES.applicationPipeline });
     void queryClient.invalidateQueries({ queryKey: INVALIDATION_PREFIXES.weeklyStats });
+    // Phase 16: check milestones after save (RD7 post-save side effect)
+    void checkMilestones();
   };
 }
 
