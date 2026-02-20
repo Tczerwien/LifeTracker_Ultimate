@@ -49,3 +49,15 @@ export function useBackupNow() {
       invoke<string>('backup_now', { destination }),
   });
 }
+
+// ---------------------------------------------------------------------------
+// File I/O utilities (not hooks — direct invoke wrappers for Data tab)
+// ---------------------------------------------------------------------------
+
+export function readTextFile(path: string): Promise<string> {
+  return invoke<string>('read_text_file', { path });
+}
+
+export function writeTextFile(path: string, content: string): Promise<void> {
+  return invoke<void>('write_text_file', { path, content });
+}

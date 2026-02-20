@@ -28,6 +28,7 @@ pub fn run() {
 
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_dialog::init())
         .manage(AppState {
             db: Mutex::new(conn),
         })
@@ -89,6 +90,9 @@ pub fn run() {
             commands::data::get_db_stats,
             commands::data::get_db_path,
             commands::data::backup_now,
+            // Phase 14: File I/O commands (Settings data tab)
+            commands::file_io::read_text_file,
+            commands::file_io::write_text_file,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -3,6 +3,7 @@ pub mod application;
 pub mod config;
 pub mod daily_log;
 pub mod data;
+pub mod file_io;
 pub mod journal;
 pub mod milestone;
 pub mod recovery;
