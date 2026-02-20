@@ -1,17 +1,19 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, Fragment } from 'react';
 import type { StudySession } from '../../types/models';
+import type { DropdownOptions } from '../../types/options';
 import { useDeleteStudySession } from '../../hooks/use-study';
 import { useToast } from '../shared/Toast';
 import DotRating from '../shared/DotRating';
 import ConfirmDialog from '../shared/ConfirmDialog';
 import EmptyStateCard from '../shared/EmptyStateCard';
+import SessionForm from './SessionForm';
 
 type SortKey = 'date' | 'subject' | 'study_type' | 'duration_minutes' | 'focus_score';
 type SortDir = 'asc' | 'desc';
 
 interface SessionTableProps {
   sessions: StudySession[];
-  onEdit: (session: StudySession) => void;
+  dropdownOptions: DropdownOptions;
 }
 
 function formatDuration(minutes: number): string {
@@ -42,9 +44,11 @@ const COLUMNS: { key: SortKey; label: string }[] = [
   { key: 'focus_score', label: 'Focus' },
 ];
 
-export default function SessionTable({ sessions, onEdit }: SessionTableProps) {
+export default function SessionTable({ sessions, dropdownOptions }: SessionTableProps) {
   const [sortKey, setSortKey] = useState<SortKey>('date');
   const [sortDir, setSortDir] = useState<SortDir>('desc');
+  const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<number | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
 
   const deleteMutation = useDeleteStudySession();
@@ -78,12 +82,28 @@ export default function SessionTable({ sessions, onEdit }: SessionTableProps) {
     return copy;
   }, [sessions, sortKey, sortDir]);
 
+  const handleRowClick = useCallback((id: number) => {
+    setExpandedId((prev) => (prev === id ? null : id));
+    setEditingId(null);
+  }, []);
+
+  const handleEditClick = useCallback((session: StudySession) => {
+    setExpandedId(session.id);
+    setEditingId(session.id);
+  }, []);
+
+  const handleCloseEdit = useCallback(() => {
+    setEditingId(null);
+  }, []);
+
   const handleConfirmDelete = useCallback(() => {
     if (deleteTarget === null) return;
     deleteMutation.mutate(deleteTarget, {
       onSuccess: () => {
         show('Session deleted', 'success');
         setDeleteTarget(null);
+        setExpandedId(null);
+        setEditingId(null);
       },
       onError: () => {
         show('Failed to delete session', 'error');
@@ -96,7 +116,7 @@ export default function SessionTable({ sessions, onEdit }: SessionTableProps) {
     return (
       <div className="mt-4">
         <EmptyStateCard
-          icon="📚"
+          icon="---"
           title="No sessions this week"
           message="Click '+ Add Session' to log your first study session."
         />
@@ -119,56 +139,130 @@ export default function SessionTable({ sessions, onEdit }: SessionTableProps) {
                   {col.label}
                   {sortKey === col.key && (
                     <span className="ml-1">
-                      {sortDir === 'asc' ? '▲' : '▼'}
+                      {sortDir === 'asc' ? '\u25B2' : '\u25BC'}
                     </span>
                   )}
                 </th>
               ))}
-              <th className="w-10 px-4 py-2.5" />
+              <th className="w-16 px-4 py-2.5" />
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
-            {sorted.map((session) => (
-              <tr
-                key={session.id}
-                onClick={() => onEdit(session)}
-                className="group cursor-pointer hover:bg-gray-50"
-              >
-                <td className="px-4 py-2.5 text-sm text-gray-700">
-                  {formatShortDate(session.date)}
-                </td>
-                <td className="px-4 py-2.5 text-sm font-medium text-surface-dark">
-                  {session.subject}
-                </td>
-                <td className="px-4 py-2.5 text-sm text-gray-600">
-                  {session.study_type}
-                </td>
-                <td className="px-4 py-2.5 text-sm text-gray-700">
-                  {formatDuration(session.duration_minutes)}
-                </td>
-                <td className="px-4 py-2.5">
-                  <DotRating
-                    value={session.focus_score}
-                    onChange={() => {}}
-                    max={5}
-                    color="#3D85C6"
-                  />
-                </td>
-                <td className="px-4 py-2.5">
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setDeleteTarget(session.id);
-                    }}
-                    className="rounded p-1 text-gray-400 opacity-0 hover:bg-red-50 hover:text-red-500 group-hover:opacity-100"
-                    aria-label="Delete session"
+          <tbody>
+            {sorted.map((session) => {
+              const isExpanded = expandedId === session.id;
+              const isEditing = editingId === session.id;
+
+              return (
+                <Fragment key={session.id}>
+                  <tr
+                    onClick={() => handleRowClick(session.id)}
+                    className={`group cursor-pointer border-b border-gray-100 hover:bg-gray-50 ${
+                      isExpanded ? 'bg-gray-50/50' : ''
+                    }`}
                   >
-                    &#10005;
-                  </button>
-                </td>
-              </tr>
-            ))}
+                    <td className="px-4 py-2.5 text-sm text-gray-700">
+                      {formatShortDate(session.date)}
+                    </td>
+                    <td className="px-4 py-2.5 text-sm font-medium text-surface-dark">
+                      {session.subject}
+                    </td>
+                    <td className="px-4 py-2.5 text-sm text-gray-600">
+                      {session.study_type}
+                    </td>
+                    <td className="px-4 py-2.5 text-sm text-gray-700">
+                      {formatDuration(session.duration_minutes)}
+                    </td>
+                    <td className="px-4 py-2.5">
+                      <DotRating
+                        value={session.focus_score}
+                        onChange={() => {}}
+                        max={5}
+                        color="#3D85C6"
+                      />
+                    </td>
+                    <td className="px-4 py-2.5">
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEditClick(session);
+                          }}
+                          className="rounded px-2 py-0.5 text-xs text-gray-500 opacity-0 hover:bg-gray-100 hover:text-gray-700 group-hover:opacity-100"
+                        >
+                          Edit
+                        </button>
+                        <span
+                          className={`text-gray-400 transition-transform duration-200 ${
+                            isExpanded ? 'rotate-90' : ''
+                          }`}
+                        >
+                          &#9656;
+                        </span>
+                      </div>
+                    </td>
+                  </tr>
+                  {isExpanded && (
+                    <tr className="border-b border-gray-100">
+                      <td colSpan={6} className="bg-white px-6 py-4">
+                        {isEditing ? (
+                          <SessionForm
+                            key={session.id}
+                            dropdownOptions={dropdownOptions}
+                            existingSession={session}
+                            onClose={handleCloseEdit}
+                          />
+                        ) : (
+                          <div className="space-y-3">
+                            <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
+                              <div>
+                                <span className="font-medium text-gray-500">Start Time:</span>{' '}
+                                <span className="text-gray-700">{session.start_time}</span>
+                              </div>
+                              <div>
+                                <span className="font-medium text-gray-500">End Time:</span>{' '}
+                                <span className="text-gray-700">{session.end_time}</span>
+                              </div>
+                              <div>
+                                <span className="font-medium text-gray-500">Location:</span>{' '}
+                                <span className="text-gray-700">{session.location}</span>
+                              </div>
+                              {session.topic.length > 0 && (
+                                <div>
+                                  <span className="font-medium text-gray-500">Topic:</span>{' '}
+                                  <span className="text-gray-700">{session.topic}</span>
+                                </div>
+                              )}
+                              {session.resources.length > 0 && (
+                                <div>
+                                  <span className="font-medium text-gray-500">Resources:</span>{' '}
+                                  <span className="text-gray-700">{session.resources}</span>
+                                </div>
+                              )}
+                              {session.notes.length > 0 && (
+                                <div className="col-span-2">
+                                  <span className="font-medium text-gray-500">Notes:</span>{' '}
+                                  <span className="text-gray-700">{session.notes}</span>
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex justify-end">
+                              <button
+                                type="button"
+                                onClick={() => setDeleteTarget(session.id)}
+                                className="rounded px-2 py-0.5 text-xs text-gray-400 hover:text-red-500"
+                              >
+                                Delete session
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  )}
+                </Fragment>
+              );
+            })}
           </tbody>
         </table>
       </div>

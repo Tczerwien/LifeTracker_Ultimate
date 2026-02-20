@@ -8,8 +8,6 @@ import WeekStats from './WeekStats';
 import SessionTable from './SessionTable';
 import SessionForm from './SessionForm';
 
-type FormMode = 'closed' | 'add' | { edit: StudySession };
-
 interface StudyLogShellProps {
   sessions: StudySession[];
   weekStart: string;
@@ -25,7 +23,7 @@ export default function StudyLogShell({
   onWeekChange,
   dropdownOptions,
 }: StudyLogShellProps) {
-  const [formMode, setFormMode] = useState<FormMode>('closed');
+  const [addOpen, setAddOpen] = useState(false);
 
   const today = todayYMD();
   const currentWeekStart = getWeekStart(today);
@@ -43,12 +41,8 @@ export default function StudyLogShell({
     onWeekChange(currentWeekStart);
   }, [currentWeekStart, onWeekChange]);
 
-  const handleEdit = useCallback((session: StudySession) => {
-    setFormMode({ edit: session });
-  }, []);
-
-  const handleCloseForm = useCallback(() => {
-    setFormMode('closed');
+  const handleCloseAdd = useCallback(() => {
+    setAddOpen(false);
   }, []);
 
   return (
@@ -66,26 +60,13 @@ export default function StudyLogShell({
 
       <WeekStats sessions={sessions} />
 
-      <SessionTable sessions={sessions} onEdit={handleEdit} />
-
-      {/* Edit form (shown when a row is clicked) */}
-      {typeof formMode === 'object' && (
-        <div className="mt-card rounded-lg border border-gray-200 bg-surface-kpi p-component">
-          <SessionForm
-            dropdownOptions={dropdownOptions}
-            existingSession={formMode.edit}
-            onClose={handleCloseForm}
-          />
-        </div>
-      )}
+      <SessionTable sessions={sessions} dropdownOptions={dropdownOptions} />
 
       {/* Add form */}
       <div className="mt-card">
         <InlineForm
-          open={formMode === 'add'}
-          onToggle={() =>
-            setFormMode((prev) => (prev === 'add' ? 'closed' : 'add'))
-          }
+          open={addOpen}
+          onToggle={() => setAddOpen((prev) => !prev)}
           trigger={
             <span className="inline-flex cursor-pointer items-center gap-1 rounded-md border border-dashed border-gray-300 px-4 py-2 text-sm text-gray-500 hover:border-productivity hover:text-productivity">
               + Add Session
@@ -94,7 +75,7 @@ export default function StudyLogShell({
         >
           <SessionForm
             dropdownOptions={dropdownOptions}
-            onClose={handleCloseForm}
+            onClose={handleCloseAdd}
           />
         </InlineForm>
       </div>
