@@ -130,7 +130,7 @@ fn quote_column_name(name: &str) -> String {
 // Query Implementations
 // ---------------------------------------------------------------------------
 
-fn get_score_trend_impl(
+pub(crate) fn get_score_trend_impl(
     conn: &Connection,
     start: &str,
     end: &str,
@@ -163,7 +163,7 @@ fn get_score_trend_impl(
     Ok(result)
 }
 
-fn get_habit_completion_rates_impl(
+pub(crate) fn get_habit_completion_rates_impl(
     conn: &Connection,
     start: &str,
     end: &str,
@@ -245,7 +245,7 @@ fn get_habit_completion_rates_impl(
     Ok(result)
 }
 
-fn get_vice_frequency_impl(
+pub(crate) fn get_vice_frequency_impl(
     conn: &Connection,
     start: &str,
     end: &str,
@@ -304,7 +304,7 @@ fn get_vice_frequency_impl(
     Ok(result)
 }
 
-fn get_day_of_week_averages_impl(
+pub(crate) fn get_day_of_week_averages_impl(
     conn: &Connection,
     start: &str,
     end: &str,
@@ -342,7 +342,7 @@ fn get_day_of_week_averages_impl(
     Ok(rows)
 }
 
-fn get_correlation_data_impl(
+pub(crate) fn get_correlation_data_impl(
     conn: &Connection,
     start: &str,
     end: &str,
@@ -360,7 +360,7 @@ fn get_correlation_data_impl(
     Ok(rows)
 }
 
-fn get_study_summary_impl(
+pub(crate) fn get_study_summary_impl(
     conn: &Connection,
     start: &str,
     end: &str,
@@ -401,7 +401,7 @@ fn get_study_summary_impl(
     })
 }
 
-fn get_application_pipeline_impl(conn: &Connection) -> CommandResult<PipelineSummary> {
+pub(crate) fn get_application_pipeline_impl(conn: &Connection) -> CommandResult<PipelineSummary> {
     let mut stmt = conn.prepare(
         "SELECT current_status, COUNT(*) FROM application \
          WHERE archived = 0 \
@@ -430,7 +430,7 @@ fn get_application_pipeline_impl(conn: &Connection) -> CommandResult<PipelineSum
     Ok(PipelineSummary { stages })
 }
 
-fn get_recovery_frequency_impl(
+pub(crate) fn get_recovery_frequency_impl(
     conn: &Connection,
     start: &str,
     end: &str,

@@ -53,7 +53,7 @@ function RelapseLogPage() {
     return (
       <div className="p-section">
         <EmptyStateCard
-          icon="---"
+          icon="⚠️"
           title="Could not load Relapse Log"
           message="Check that the app data directory is accessible and try restarting."
           actionLabel="Retry"

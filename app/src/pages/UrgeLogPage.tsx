@@ -49,7 +49,7 @@ function UrgeLogPage() {
     return (
       <div className="p-section">
         <EmptyStateCard
-          icon="---"
+          icon="⚠️"
           title="Could not load Urge Log"
           message="Check that the app data directory is accessible and try restarting."
           actionLabel="Retry"

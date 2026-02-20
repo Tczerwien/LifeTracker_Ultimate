@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { invoke } from '@tauri-apps/api/core';
-import type { DbStats } from '../types/commands';
+import type { DbStats, TestDataSummary } from '../types/commands';
 import { QUERY_KEYS } from '../lib/query-keys';
 
 // ---------------------------------------------------------------------------
@@ -47,6 +47,18 @@ export function useBackupNow() {
   return useMutation({
     mutationFn: (destination: string) =>
       invoke<string>('backup_now', { destination }),
+  });
+}
+
+export function useGenerateTestData() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => invoke<TestDataSummary>('generate_test_data'),
+    onSuccess: () => {
+      // Test data replaces all data — clear entire cache so everything reloads
+      queryClient.clear();
+    },
   });
 }
 

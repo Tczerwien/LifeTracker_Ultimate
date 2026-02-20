@@ -314,6 +314,17 @@ export interface WeeklyRecoveryData {
 // Data Management
 // ---------------------------------------------------------------------------
 
+/** Test data generation summary. Matches Rust TestDataSummary. */
+export interface TestDataSummary {
+  daily_logs: number;
+  journals: number;
+  study_sessions: number;
+  applications: number;
+  relapse_entries: number;
+  urge_entries: number;
+  weekly_reviews: number;
+}
+
 /** Database statistics. Matches Rust DbStats. */
 export interface DbStats {
   file_size_bytes: number;

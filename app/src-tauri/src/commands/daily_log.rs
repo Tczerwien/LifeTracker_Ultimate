@@ -101,7 +101,7 @@ pub struct DailyLogInput {
 }
 
 /// Internal representation of a habit_config row needed for scoring input construction.
-struct HabitConfigRow {
+pub(crate) struct HabitConfigRow {
     name: String,
     pool: String,
     category: Option<String>,
@@ -250,7 +250,7 @@ fn parse_category(s: &str) -> HabitCategory {
 // ---------------------------------------------------------------------------
 
 /// Loads the scoring configuration from the app_config singleton row.
-fn load_scoring_config(conn: &Connection) -> CommandResult<ScoringConfig> {
+pub(crate) fn load_scoring_config(conn: &Connection) -> CommandResult<ScoringConfig> {
     conn.query_row(
         "SELECT multiplier_productivity, multiplier_health, multiplier_growth, \
          target_fraction, vice_cap, streak_threshold, \
@@ -283,7 +283,7 @@ fn load_scoring_config(conn: &Connection) -> CommandResult<ScoringConfig> {
 }
 
 /// Loads all active habit configuration rows.
-fn load_active_habit_configs(conn: &Connection) -> CommandResult<Vec<HabitConfigRow>> {
+pub(crate) fn load_active_habit_configs(conn: &Connection) -> CommandResult<Vec<HabitConfigRow>> {
     let mut stmt = conn.prepare(
         "SELECT name, pool, category, input_type, points, penalty, \
          penalty_mode, options_json, column_name \
@@ -340,7 +340,7 @@ fn load_subsequent_days(
 // ---------------------------------------------------------------------------
 
 /// Builds HabitValue entries for all active good habits.
-fn build_habit_values(entry: &DailyLogInput, configs: &[HabitConfigRow]) -> Vec<HabitValue> {
+pub(crate) fn build_habit_values(entry: &DailyLogInput, configs: &[HabitConfigRow]) -> Vec<HabitValue> {
     configs
         .iter()
         .filter(|c| c.pool == "good")
@@ -373,7 +373,7 @@ fn build_habit_values(entry: &DailyLogInput, configs: &[HabitConfigRow]) -> Vec<
 }
 
 /// Builds ViceValue entries for all active vices.
-fn build_vice_values(entry: &DailyLogInput, configs: &[HabitConfigRow]) -> Vec<ViceValue> {
+pub(crate) fn build_vice_values(entry: &DailyLogInput, configs: &[HabitConfigRow]) -> Vec<ViceValue> {
     configs
         .iter()
         .filter(|c| c.pool == "vice")

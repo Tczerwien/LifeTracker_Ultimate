@@ -94,6 +94,8 @@ pub fn run() {
             // Phase 14: File I/O commands (Settings data tab)
             commands::file_io::read_text_file,
             commands::file_io::write_text_file,
+            // Phase 17.4: Test data generation
+            commands::testdata::generate_test_data,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -13,6 +13,7 @@ import {
   useExportData,
   useImportData,
   useBackupNow,
+  useGenerateTestData,
   readTextFile,
   writeTextFile,
 } from '../../hooks/use-data';
@@ -72,6 +73,7 @@ export default function DataTab({ dbStats, dbPath, config }: DataTabProps) {
   const exportMutation = useExportData();
   const importMutation = useImportData();
   const backupMutation = useBackupNow();
+  const generateMutation = useGenerateTestData();
   const saveConfigMutation = useSaveConfig();
   const { show } = useToast();
 
@@ -206,6 +208,29 @@ export default function DataTab({ dbStats, dbPath, config }: DataTabProps) {
       setBusy(false);
     }
   }, [backupMutation, dbStats, show]);
+
+  // ── Generate Test Data ────────────────────────────────────────────────
+
+  const handleGenerateTestData = useCallback(async () => {
+    try {
+      setBusy(true);
+      const summary = await generateMutation.mutateAsync();
+      show(
+        `Generated ${summary.daily_logs} daily logs, ${summary.journals} journals, ` +
+        `${summary.study_sessions} study sessions, ${summary.applications} applications, ` +
+        `${summary.relapse_entries} relapses, ${summary.urge_entries} urges, ` +
+        `${summary.weekly_reviews} weekly reviews`,
+        'success',
+      );
+    } catch (err) {
+      show(
+        `Generation failed: ${err instanceof Error ? err.message : String(err)}`,
+        'error',
+      );
+    } finally {
+      setBusy(false);
+    }
+  }, [generateMutation, show]);
 
   // ── Dropdown list management ──────────────────────────────────────────
 
@@ -415,6 +440,14 @@ export default function DataTab({ dbStats, dbPath, config }: DataTabProps) {
             className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Backup Database
+          </button>
+          <button
+            type="button"
+            onClick={() => void handleGenerateTestData()}
+            disabled={busy}
+            className="rounded-md border border-amber-300 bg-amber-50 px-4 py-2 text-sm font-medium text-amber-700 hover:bg-amber-100 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {generateMutation.isPending ? 'Generating...' : 'Generate Test Data'}
           </button>
         </div>
       </section>
