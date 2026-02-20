@@ -39,4 +39,11 @@ describe('DatePicker', () => {
     fireEvent.mouseDown(screen.getByTestId('outside'));
     expect(onClose).toHaveBeenCalled();
   });
+
+  it('calls onClose on Escape key', () => {
+    const onClose = vi.fn();
+    render(<DatePicker {...defaultProps} onClose={onClose} />);
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(onClose).toHaveBeenCalled();
+  });
 });

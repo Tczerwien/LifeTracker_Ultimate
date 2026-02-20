@@ -60,4 +60,22 @@ describe('DateNavigator', () => {
     // DatePicker renders day grid cells for the calendar
     expect(screen.getByRole('gridcell', { name: '17' })).toBeInTheDocument();
   });
+
+  it('shows "(no entry)" when hasLogEntry is false and date is in the past', () => {
+    useUIStore.setState({ selectedDate: '2026-02-16' });
+    render(<DateNavigator hasLogEntry={false} />);
+    expect(screen.getByText('(no entry)')).toBeInTheDocument();
+  });
+
+  it('does not show "(no entry)" when hasLogEntry is true', () => {
+    useUIStore.setState({ selectedDate: '2026-02-16' });
+    render(<DateNavigator hasLogEntry />);
+    expect(screen.queryByText('(no entry)')).toBeNull();
+  });
+
+  it('does not show "(no entry)" for today even when hasLogEntry is false', () => {
+    useUIStore.setState({ selectedDate: '2026-02-18' });
+    render(<DateNavigator hasLogEntry={false} />);
+    expect(screen.queryByText('(no entry)')).toBeNull();
+  });
 });

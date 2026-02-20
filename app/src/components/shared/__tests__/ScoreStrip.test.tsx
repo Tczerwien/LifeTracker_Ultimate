@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import ScoreStrip from '../ScoreStrip';
+import ScoreStrip, { ScoreStripSkeleton } from '../ScoreStrip';
 
 const defaultProps = {
   finalScore: 0.84,
@@ -72,5 +72,13 @@ describe('ScoreStrip', () => {
     expect(screen.getByText(/🔥 0 days/)).toBeInTheDocument();
     // Both positive% and vice% render as '0%'
     expect(screen.getAllByText('0%')).toHaveLength(2);
+  });
+});
+
+describe('ScoreStripSkeleton', () => {
+  it('renders 5 skeleton cells', () => {
+    const { container } = render(<ScoreStripSkeleton />);
+    const cells = container.querySelectorAll('.text-center');
+    expect(cells).toHaveLength(5);
   });
 });

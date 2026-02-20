@@ -30,6 +30,11 @@ function UrgeLogPage() {
   const isLoading = entriesQuery.isLoading || configQuery.isLoading;
   const isError = entriesQuery.isError || configQuery.isError;
 
+  const handleRetry = () => {
+    void entriesQuery.refetch();
+    void configQuery.refetch();
+  };
+
   if (isLoading) {
     return (
       <div className="p-section space-y-4 animate-pulse">
@@ -47,6 +52,8 @@ function UrgeLogPage() {
           icon="---"
           title="Could not load Urge Log"
           message="Check that the app data directory is accessible and try restarting."
+          actionLabel="Retry"
+          onAction={handleRetry}
         />
       </div>
     );

@@ -29,6 +29,11 @@ function SettingsPage() {
   const isLoading = configQuery.isLoading || habitsQuery.isLoading;
   const isError = configQuery.isError || habitsQuery.isError;
 
+  const handleRetry = () => {
+    void configQuery.refetch();
+    void habitsQuery.refetch();
+  };
+
   if (isLoading) {
     return (
       <div className="p-section space-y-4 animate-pulse">
@@ -46,6 +51,8 @@ function SettingsPage() {
           icon="⚠️"
           title="Could not load Settings"
           message="Check that the app data directory is accessible and try restarting."
+          actionLabel="Retry"
+          onAction={handleRetry}
         />
       </div>
     );

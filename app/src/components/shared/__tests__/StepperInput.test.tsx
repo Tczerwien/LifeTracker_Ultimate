@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import StepperInput from '../StepperInput';
 
 describe('StepperInput', () => {
@@ -51,5 +51,37 @@ describe('StepperInput', () => {
     render(<StepperInput value={8} onChange={onChange} max={10} step={5} />);
     screen.getByLabelText('Increase').click();
     expect(onChange).toHaveBeenCalledWith(10);
+  });
+
+  it('increments on ArrowUp key', () => {
+    const onChange = vi.fn();
+    render(<StepperInput value={3} onChange={onChange} />);
+    const spinbutton = screen.getByRole('spinbutton');
+    fireEvent.keyDown(spinbutton, { key: 'ArrowUp' });
+    expect(onChange).toHaveBeenCalledWith(4);
+  });
+
+  it('decrements on ArrowDown key', () => {
+    const onChange = vi.fn();
+    render(<StepperInput value={3} onChange={onChange} />);
+    const spinbutton = screen.getByRole('spinbutton');
+    fireEvent.keyDown(spinbutton, { key: 'ArrowDown' });
+    expect(onChange).toHaveBeenCalledWith(2);
+  });
+
+  it('does not increment past max on ArrowUp', () => {
+    const onChange = vi.fn();
+    render(<StepperInput value={10} onChange={onChange} max={10} />);
+    const spinbutton = screen.getByRole('spinbutton');
+    fireEvent.keyDown(spinbutton, { key: 'ArrowUp' });
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it('does not decrement past min on ArrowDown', () => {
+    const onChange = vi.fn();
+    render(<StepperInput value={0} onChange={onChange} min={0} />);
+    const spinbutton = screen.getByRole('spinbutton');
+    fireEvent.keyDown(spinbutton, { key: 'ArrowDown' });
+    expect(onChange).not.toHaveBeenCalled();
   });
 });

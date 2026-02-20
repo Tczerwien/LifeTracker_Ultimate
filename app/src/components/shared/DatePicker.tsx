@@ -34,6 +34,17 @@ export default function DatePicker({
     return () => document.removeEventListener('mousedown', handleMouseDown);
   }, [onClose]);
 
+  // Close on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   const selectedDate = parseYMD(selected);
   const disabled: Matcher[] = [];
   if (minDate) disabled.push({ before: parseYMD(minDate) });

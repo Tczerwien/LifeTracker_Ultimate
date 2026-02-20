@@ -22,6 +22,8 @@ function AnalyticsPage() {
           icon="⚠️"
           title="Could not load Analytics"
           message="Check that the app data directory is accessible and try restarting."
+          actionLabel="Retry"
+          onAction={() => void configQuery.refetch()}
         />
       </div>
     );

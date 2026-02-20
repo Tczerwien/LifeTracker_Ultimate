@@ -22,6 +22,8 @@ function MilestonePage() {
           icon="⚠️"
           title="Could not load milestones"
           message="Check that the app data directory is accessible and try restarting."
+          actionLabel="Retry"
+          onAction={() => void milestonesQuery.refetch()}
         />
       </div>
     );

@@ -13,6 +13,11 @@ function WeeklyReviewPage() {
   const isLoading = reviewQuery.isLoading || statsQuery.isLoading;
   const isError = reviewQuery.isError || statsQuery.isError;
 
+  const handleRetry = () => {
+    void reviewQuery.refetch();
+    void statsQuery.refetch();
+  };
+
   if (isLoading) {
     return (
       <div className="p-section space-y-4 animate-pulse">
@@ -30,6 +35,8 @@ function WeeklyReviewPage() {
           icon="⚠️"
           title="Could not load Weekly Review"
           message="Check that the app data directory is accessible and try restarting."
+          actionLabel="Retry"
+          onAction={handleRetry}
         />
       </div>
     );

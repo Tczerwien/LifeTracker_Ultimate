@@ -6,11 +6,13 @@ import DatePicker from './DatePicker';
 interface DateNavigatorProps {
   readOnly?: boolean;
   minDate?: string;
+  hasLogEntry?: boolean;
 }
 
 export default function DateNavigator({
   readOnly = false,
   minDate,
+  hasLogEntry,
 }: DateNavigatorProps) {
   const selectedDate = useUIStore((s) => s.selectedDate);
   const setSelectedDate = useUIStore((s) => s.setSelectedDate);
@@ -43,13 +45,20 @@ export default function DateNavigator({
       </button>
 
       <div className="relative">
-        <button
-          type="button"
-          onClick={() => setPickerOpen(!pickerOpen)}
-          className="text-body font-medium text-surface-dark hover:text-productivity"
-        >
-          {formatDisplayDate(selectedDate)}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setPickerOpen(!pickerOpen)}
+            className="text-body font-medium text-surface-dark hover:text-productivity"
+          >
+            {formatDisplayDate(selectedDate)}
+          </button>
+          {hasLogEntry === false && !atEnd && (
+            <span className="text-subdued text-amber-500" title="No log entry for this date">
+              (no entry)
+            </span>
+          )}
+        </div>
         {pickerOpen && (
           <DatePicker
             selected={selectedDate}

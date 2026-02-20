@@ -25,6 +25,11 @@ function AppLogPage() {
   const isLoading = appsQuery.isLoading || configQuery.isLoading;
   const isError = appsQuery.isError || configQuery.isError;
 
+  const handleRetry = () => {
+    void appsQuery.refetch();
+    void configQuery.refetch();
+  };
+
   const handleStatusFilterChange = useCallback((statuses: ApplicationStatus[]) => {
     setStatusFilter(statuses);
   }, []);
@@ -50,6 +55,8 @@ function AppLogPage() {
           icon="⚠️"
           title="Could not load App Log"
           message="Check that the app data directory is accessible and try restarting."
+          actionLabel="Retry"
+          onAction={handleRetry}
         />
       </div>
     );

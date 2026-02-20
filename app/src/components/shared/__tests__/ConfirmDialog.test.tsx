@@ -66,4 +66,36 @@ describe('ConfirmDialog', () => {
     const confirmBtn = screen.getByText('Confirm');
     expect(confirmBtn.className).toContain('bg-productivity');
   });
+
+  it('returns focus to previously focused element after close', () => {
+    const onCancel = vi.fn();
+    const { rerender } = render(
+      <div>
+        <button data-testid="trigger">Trigger</button>
+        <ConfirmDialog {...defaultProps} open={false} onCancel={onCancel} />
+      </div>,
+    );
+    // Focus the trigger before opening dialog
+    const trigger = screen.getByTestId('trigger');
+    trigger.focus();
+    expect(trigger).toHaveFocus();
+    // Open the dialog
+    rerender(
+      <div>
+        <button data-testid="trigger">Trigger</button>
+        <ConfirmDialog {...defaultProps} open onCancel={onCancel} />
+      </div>,
+    );
+    // Cancel button should be focused
+    expect(screen.getByText('Cancel')).toHaveFocus();
+    // Close the dialog
+    rerender(
+      <div>
+        <button data-testid="trigger">Trigger</button>
+        <ConfirmDialog {...defaultProps} open={false} onCancel={onCancel} />
+      </div>,
+    );
+    // Focus should return to the trigger
+    expect(trigger).toHaveFocus();
+  });
 });

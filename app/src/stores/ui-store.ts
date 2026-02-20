@@ -11,6 +11,7 @@ interface UIState {
   recoveryExpanded: boolean;
 
   setSelectedDate: (date: string) => void;
+  setSidebarOpen: (open: boolean) => void;
   toggleSidebar: () => void;
   setActiveAnalyticsSection: (section: string | null) => void;
   setAnalyticsWindow: (window: AnalyticsWindow) => void;
@@ -33,6 +34,7 @@ export const useUIStore = create<UIState>()((set) => ({
   recoveryExpanded: false,
 
   setSelectedDate: (date) => set({ selectedDate: date }),
+  setSidebarOpen: (open) => set({ sidebarOpen: open }),
   toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
   setActiveAnalyticsSection: (section) => set({ activeAnalyticsSection: section }),
   setAnalyticsWindow: (window) => set({ analyticsWindow: window }),

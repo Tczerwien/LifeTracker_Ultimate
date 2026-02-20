@@ -24,6 +24,8 @@ function JournalPage() {
           icon="⚠️"
           title="Could not load Journal"
           message="Check that the app data directory is accessible and try restarting."
+          actionLabel="Retry"
+          onAction={() => void journalQuery.refetch()}
         />
       </div>
     );

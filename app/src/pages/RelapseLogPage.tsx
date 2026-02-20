@@ -33,6 +33,12 @@ function RelapseLogPage() {
   const isError =
     entriesQuery.isError || todayUrgesQuery.isError || configQuery.isError;
 
+  const handleRetry = () => {
+    void entriesQuery.refetch();
+    void todayUrgesQuery.refetch();
+    void configQuery.refetch();
+  };
+
   if (isLoading) {
     return (
       <div className="p-section space-y-4 animate-pulse">
@@ -50,6 +56,8 @@ function RelapseLogPage() {
           icon="---"
           title="Could not load Relapse Log"
           message="Check that the app data directory is accessible and try restarting."
+          actionLabel="Retry"
+          onAction={handleRetry}
         />
       </div>
     );

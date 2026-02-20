@@ -17,11 +17,11 @@ interface KpiCellProps {
 
 function KpiCell({ label, value, color }: KpiCellProps) {
   return (
-    <div className="text-center">
-      <div className="text-kpi-value" style={{ color }}>
+    <div className="min-w-0 text-center">
+      <div className="truncate text-kpi-value" style={{ color }}>
         {value}
       </div>
-      <div className="text-kpi-label text-gray-500">{label}</div>
+      <div className="truncate text-kpi-label text-gray-500">{label}</div>
     </div>
   );
 }
@@ -37,7 +37,7 @@ export default function ScoreStrip({
     streak >= 7 ? STREAK_GOLD : scoreColor(Math.min(streak / 7, 1));
 
   return (
-    <div className="flex items-center justify-between rounded-lg bg-surface-kpi p-component">
+    <div className="flex items-center justify-between gap-2 rounded-lg bg-surface-kpi p-component">
       <KpiCell
         label="Final Score"
         value={finalScore.toFixed(2)}
@@ -63,6 +63,21 @@ export default function ScoreStrip({
         value={`${Math.round(vicePenalty * 100)}%`}
         color={scoreColor(1 - vicePenalty)}
       />
+    </div>
+  );
+}
+
+const SKELETON_CELLS = 5;
+
+export function ScoreStripSkeleton() {
+  return (
+    <div className="flex items-center justify-between gap-2 rounded-lg bg-surface-kpi p-component animate-pulse">
+      {Array.from({ length: SKELETON_CELLS }, (_, i) => (
+        <div key={i} className="text-center">
+          <div className="mx-auto h-5 w-12 rounded bg-gray-200" />
+          <div className="mx-auto mt-1 h-3 w-16 rounded bg-gray-200" />
+        </div>
+      ))}
     </div>
   );
 }

@@ -33,4 +33,14 @@ describe('InlineForm', () => {
     screen.getByText('Add').click();
     expect(onToggle).toHaveBeenCalledOnce();
   });
+
+  it('focuses first input when opened', () => {
+    render(
+      <InlineForm open onToggle={vi.fn()} trigger={<span>Add</span>}>
+        <input data-testid="first-input" />
+        <input data-testid="second-input" />
+      </InlineForm>,
+    );
+    expect(screen.getByTestId('first-input')).toHaveFocus();
+  });
 });

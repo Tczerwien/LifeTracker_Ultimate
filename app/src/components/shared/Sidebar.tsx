@@ -44,10 +44,21 @@ function recoveryNavLinkClass({ isActive }: { isActive: boolean }): string {
 function Sidebar() {
   const recoveryExpanded = useUIStore((state) => state.recoveryExpanded);
   const toggleRecoveryExpanded = useUIStore((state) => state.toggleRecoveryExpanded);
+  const setSidebarOpen = useUIStore((state) => state.setSidebarOpen);
 
   return (
     <aside className="w-60 bg-surface-dark text-white p-component flex flex-col h-screen shrink-0">
-      <h1 className="text-lg font-bold mb-section">Life Tracker Ultimate</h1>
+      <div className="flex items-center justify-between mb-section">
+        <h1 className="text-lg font-bold">Life Tracker Ultimate</h1>
+        <button
+          type="button"
+          aria-label="Collapse sidebar"
+          onClick={() => setSidebarOpen(false)}
+          className="rounded p-1 text-gray-400 hover:text-white"
+        >
+          {'\u2715'}
+        </button>
+      </div>
 
       {/* Primary Nav */}
       <nav className="space-y-1">

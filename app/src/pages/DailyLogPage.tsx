@@ -14,6 +14,12 @@ function DailyLogPage() {
   const isLoading = logQuery.isLoading || habitsQuery.isLoading || configQuery.isLoading;
   const isError = logQuery.isError || habitsQuery.isError || configQuery.isError;
 
+  const handleRetry = () => {
+    void logQuery.refetch();
+    void habitsQuery.refetch();
+    void configQuery.refetch();
+  };
+
   const activeHabits = useMemo(
     () => (habitsQuery.data ?? []).filter((h) => h.is_active),
     [habitsQuery.data],
@@ -36,6 +42,8 @@ function DailyLogPage() {
           icon="\u26A0\uFE0F"
           title="Could not load Daily Log"
           message="Check that the app data directory is accessible and try restarting."
+          actionLabel="Retry"
+          onAction={handleRetry}
         />
       </div>
     );

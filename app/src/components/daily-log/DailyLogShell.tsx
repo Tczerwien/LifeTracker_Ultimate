@@ -30,7 +30,7 @@ export default function DailyLogShell({
 
   return (
     <div className="p-section">
-      <DateNavigator minDate={config.start_date} />
+      <DateNavigator minDate={config.start_date} hasLogEntry={dailyLog !== null} />
 
       {isPastDate && (
         <div className="mt-2 rounded-md bg-blue-50 px-3 py-1.5 text-center text-subdued text-blue-600">

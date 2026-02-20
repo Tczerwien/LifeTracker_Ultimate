@@ -21,6 +21,11 @@ function StudyLogPage() {
   const isLoading = sessionsQuery.isLoading || configQuery.isLoading;
   const isError = sessionsQuery.isError || configQuery.isError;
 
+  const handleRetry = () => {
+    void sessionsQuery.refetch();
+    void configQuery.refetch();
+  };
+
   if (isLoading) {
     return (
       <div className="p-section space-y-4 animate-pulse">
@@ -38,6 +43,8 @@ function StudyLogPage() {
           icon="⚠️"
           title="Could not load Study Log"
           message="Check that the app data directory is accessible and try restarting."
+          actionLabel="Retry"
+          onAction={handleRetry}
         />
       </div>
     );
