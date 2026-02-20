@@ -4,7 +4,11 @@ A local-first desktop app for end-of-day personal reflection and behavior tracki
 
 Built with **Tauri 2 + React + TypeScript + SQLite**.
 
-![Status](https://img.shields.io/badge/status-in%20development-yellow)
+[![CI](https://github.com/Tczerwien/LifeTracker_Ultimate/actions/workflows/ci.yml/badge.svg)](https://github.com/Tczerwien/LifeTracker_Ultimate/actions/workflows/ci.yml)
+![Version](https://img.shields.io/badge/version-0.1.0-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)
+![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)
 
 ---
 

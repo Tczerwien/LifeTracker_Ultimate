@@ -13,8 +13,13 @@
 !LICENSE
 !LICENSE.*
 !CLAUDE.md
+!CHANGELOG.md
+!CONTRIBUTING.md
+!SECURITY.md
 
 # Allow project directories through
+!.github/
+!.github/**
 !docs/
 !docs/**
 !app/
