@@ -107,6 +107,10 @@ function pearsonR(x: number[], y: number[]): number {
 // Public API
 // ---------------------------------------------------------------------------
 
+// Minimum sample size for Pearson's r to have statistical meaning. With fewer
+// than 7 paired observations, the correlation coefficient is unreliable —
+// a single outlier can dominate the result and the t-test for significance
+// has only (n−2) = 5 degrees of freedom, making any r-value non-significant.
 const MIN_DATA_POINTS = 7;
 
 /**

@@ -1,5 +1,5 @@
 import { scoreColor } from '../../lib/score-utils';
-import { STREAK_GOLD } from '../../lib/constants';
+import { STREAK_GOLD, STREAK_GOLD_THRESHOLD } from '../../lib/constants';
 
 interface ScoreStripProps {
   finalScore: number;
@@ -34,7 +34,7 @@ export default function ScoreStrip({
   vicePenalty,
 }: ScoreStripProps) {
   const streakColor =
-    streak >= 7 ? STREAK_GOLD : scoreColor(Math.min(streak / 7, 1));
+    streak >= STREAK_GOLD_THRESHOLD ? STREAK_GOLD : scoreColor(Math.min(streak / STREAK_GOLD_THRESHOLD, 1));
 
   return (
     <div className="flex items-center justify-between gap-2 rounded-lg bg-surface-kpi p-component">

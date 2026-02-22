@@ -11,7 +11,7 @@ import {
 import { useScoreTrend, useHabitCompletionRates } from '../../hooks/use-analytics';
 import { useConfig } from '../../hooks/use-config';
 import { scoreColor } from '../../lib/score-utils';
-import { CATEGORY_COLORS, STREAK_GOLD } from '../../lib/constants';
+import { CATEGORY_COLORS, STREAK_GOLD, STREAK_GOLD_THRESHOLD } from '../../lib/constants';
 import { MIN_ENTRIES } from '../../lib/analytics-utils';
 import { HabitCategory } from '../../types/enums';
 import type { AnalyticsWindow } from '../../stores/ui-store';
@@ -139,7 +139,7 @@ export default function OverviewSection({
     );
   }
 
-  const streakColor = currentStreak >= 7 ? STREAK_GOLD : scoreColor(Math.min(currentStreak / 7, 1));
+  const streakColor = currentStreak >= STREAK_GOLD_THRESHOLD ? STREAK_GOLD : scoreColor(Math.min(currentStreak / STREAK_GOLD_THRESHOLD, 1));
 
   return (
     <div className="space-y-6">

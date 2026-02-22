@@ -7,6 +7,9 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
+/// Rolling backup retention count (ADR-001 SD3). Keeps the 7 most recent
+/// backups — roughly one week of daily launches — balancing disk usage against
+/// the ability to recover from recent corruption or accidental changes.
 const MAX_BACKUPS: usize = 7;
 
 /// Run automatic backup before DB connection is opened.

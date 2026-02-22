@@ -37,6 +37,19 @@ export function getAnalyticsDateRange(
 // Empty-state thresholds
 // ---------------------------------------------------------------------------
 
+// Minimum logged days before each analytics section renders meaningful content.
+// Below these thresholds the data is too sparse for the visualization to be
+// useful, so we show an empty-state card instead.
+//
+// overview:
+//   '7d': 7  — need a full week of data to fill the 7-day chart.
+//   '30d': 14 — half the window; below this, averages and trends are noisy.
+//   '90d': 14 — same rationale; a sparse 90-day chart is misleading.
+//   all: 7    — at minimum one full week of tracking to draw any conclusions.
+// trends: 7   — need >= 7 points for a trend line to show direction.
+// correlations: 30 — Pearson's r needs 30+ paired observations for the
+//   result to be practically meaningful in a habit-tracking context.
+// records: 1  — personal records are valid with a single entry.
 export const MIN_ENTRIES = {
   overview: { '7d': 7, '30d': 14, '90d': 14, all: 7 } as const,
   trends: 7,

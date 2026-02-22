@@ -85,14 +85,14 @@ fn query_all_milestones(conn: &Connection) -> CommandResult<Vec<Milestone>> {
 fn is_threshold_met(milestone_id: &str, ctx: &MilestoneContext) -> bool {
     match milestone_id {
         // Tracking milestones
-        "first_steps" => ctx.total_days_tracked >= 1,
-        "one_week_in" => ctx.total_days_tracked >= 7,
+        "first_steps" => ctx.total_days_tracked >= 1, // first day logged
+        "one_week_in" => ctx.total_days_tracked >= 7, // one full week of tracking
 
         // Score milestones
-        "streak_5" => ctx.current_streak >= 5,
-        "streak_7" => ctx.current_streak >= 7,
-        "streak_30" => ctx.current_streak >= 30,
-        "avg_80" => ctx.avg_score_7d >= 80.0,
+        "streak_5" => ctx.current_streak >= 5,   // first multi-day achievement
+        "streak_7" => ctx.current_streak >= 7,   // full week streak
+        "streak_30" => ctx.current_streak >= 30, // monthly streak achievement
+        "avg_80" => ctx.avg_score_7d >= 80.0,    // 80% of max over trailing 7 days
         "trending_up" => {
             // Requires multi-month trend analysis beyond MilestoneContext scope.
             // Deferred to future implementation.

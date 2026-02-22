@@ -10,6 +10,11 @@ import EmptyStateCard from '../shared/EmptyStateCard';
 // Correlation color by strength
 // ---------------------------------------------------------------------------
 
+// Pearson's r strength thresholds for color-coding, following Cohen's (1988)
+// conventions for behavioral sciences:
+//   |r| > 0.5  → strong    (green / red)
+//   |r| > 0.2  → moderate  (blue / amber)
+//   |r| <= 0.2 → weak      (gray)
 function correlationColor(r: number | null): string {
   if (r === null) return '#9CA3AF';
   if (r > 0.5) return '#6AA84F';

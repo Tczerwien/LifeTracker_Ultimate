@@ -54,6 +54,9 @@ export const SCORE_GRADIENT = [
 
 export const STREAK_GOLD = '#FFD700';
 
+/** Streak length (days) at which the display color switches to gold. */
+export const STREAK_GOLD_THRESHOLD = 7;
+
 // ---------------------------------------------------------------------------
 // Category → Multiplier Field Mapping
 // ---------------------------------------------------------------------------

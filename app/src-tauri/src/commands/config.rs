@@ -108,6 +108,10 @@ const HABIT_CONFIG_COLUMNS: &str = "\
     sort_order, is_active, column_name, \
     created_at, retired_at";
 
+/// Allowed values for `correlation_window_days`. 0 means "all time"; the
+/// remaining values (30, 60, 90, 180, 365) map to common analytics horizons.
+/// Restricting to this set prevents nonsensical windows and keeps the UI
+/// dropdown in sync with the backend.
 const VALID_CORRELATION_WINDOWS: [i64; 6] = [0, 30, 60, 90, 180, 365];
 
 // ---------------------------------------------------------------------------
@@ -233,21 +237,24 @@ fn validate_app_config_input(input: &AppConfigInput) -> CommandResult<()> {
         ));
     }
 
-    // streak_bonus_per_day: [0, 0.1]
+    // streak_bonus_per_day: [0, 0.1] — capped at 0.1 so a 10-day streak cannot
+    // more than double the score (10 × 0.1 = 100% bonus).
     if input.streak_bonus_per_day < 0.0 || input.streak_bonus_per_day > 0.1 {
         return Err(CommandError::from(
             "streak_bonus_per_day must be >= 0 and <= 0.1",
         ));
     }
 
-    // max_streak_bonus: [0, 0.5]
+    // max_streak_bonus: [0, 0.5] — caps the cumulative streak benefit at +50%
+    // to keep final scores within a meaningful range.
     if input.max_streak_bonus < 0.0 || input.max_streak_bonus > 0.5 {
         return Err(CommandError::from(
             "max_streak_bonus must be >= 0 and <= 0.5",
         ));
     }
 
-    // Phone tier thresholds: [0, 1440] and ascending
+    // Phone tier thresholds: [0, 1440] and ascending.
+    // 1440 = 24 × 60 — the total number of minutes in a day.
     if input.phone_t1_min < 0 || input.phone_t1_min > 1440 {
         return Err(CommandError::from(
             "phone_t1_min must be >= 0 and <= 1440",
