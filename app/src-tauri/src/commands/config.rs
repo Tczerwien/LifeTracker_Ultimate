@@ -626,7 +626,7 @@ mod tests {
         let config = query_config(&conn).unwrap();
 
         assert_eq!(config.id, "default");
-        assert_eq!(config.start_date, "2026-01-20");
+        assert_eq!(config.start_date, "2026-02-22");
         assert_eq!(config.multiplier_productivity, 1.5);
         assert_eq!(config.multiplier_health, 1.3);
         assert_eq!(config.multiplier_growth, 1.0);

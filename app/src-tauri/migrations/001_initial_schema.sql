@@ -334,7 +334,7 @@ INSERT INTO app_config (
   dropdown_options,
   last_modified
 ) VALUES (
-  'default', '2026-01-20',
+  'default', '2026-02-22',
   1.5, 1.3, 1.0,
   0.85, 0.40, 0.65, 0.01, 0.10,
   61, 181, 301,

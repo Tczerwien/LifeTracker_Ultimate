@@ -62,6 +62,11 @@ fn get_migrations() -> Vec<(i64, &'static str, &'static str)> {
             "update_status_values",
             include_str!("../../migrations/002_update_status_values.sql"),
         ),
+        (
+            3,
+            "reset_start_date",
+            include_str!("../../migrations/003_reset_start_date.sql"),
+        ),
     ]
 }
 
@@ -237,7 +242,7 @@ mod tests {
             .unwrap();
 
         assert_eq!(id, "default");
-        assert_eq!(start_date, "2026-01-20");
+        assert_eq!(start_date, "2026-02-22");
         assert!((target_fraction - 0.85).abs() < f64::EPSILON);
         assert!((vice_cap - 0.40).abs() < f64::EPSILON);
         assert_eq!(correlation_window, 90);
