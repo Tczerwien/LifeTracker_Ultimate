@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::AppState;
 
+use super::validation::validate_text_length;
 use super::{CommandError, CommandResult};
 
 // ---------------------------------------------------------------------------
@@ -90,6 +91,11 @@ pub fn save_journal(
     entry: JournalInput,
 ) -> CommandResult<Journal> {
     let db = state.db.lock().map_err(|_| CommandError::from("DB lock poisoned"))?;
+
+    validate_text_length("Highlight", &entry.highlight, 8000)?;
+    validate_text_length("Gratitude", &entry.gratitude, 8000)?;
+    validate_text_length("Reflection", &entry.reflection, 8000)?;
+    validate_text_length("Tomorrow goal", &entry.tomorrow_goal, 8000)?;
 
     {
         let tx = db

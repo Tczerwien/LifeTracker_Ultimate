@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::AppState;
 
+use super::validation::{validate_optional_text_length, validate_text_length};
 use super::{CommandError, CommandResult};
 
 // ---------------------------------------------------------------------------
@@ -236,10 +237,26 @@ pub fn save_application(
     save_application_impl(&db, app)
 }
 
+fn validate_application_input(app: &ApplicationInput) -> CommandResult<()> {
+    validate_text_length("Company", &app.company, 1000)?;
+    validate_text_length("Role", &app.role, 1000)?;
+    validate_text_length("Source", &app.source, 1000)?;
+    validate_text_length("URL", &app.url, 1000)?;
+    validate_text_length("Notes", &app.notes, 1000)?;
+    validate_text_length("Salary", &app.salary, 1000)?;
+    validate_text_length("Contact name", &app.contact_name, 1000)?;
+    validate_text_length("Contact email", &app.contact_email, 1000)?;
+    validate_text_length("Login username", &app.login_username, 500)?;
+    validate_text_length("Login password", &app.login_password, 500)?;
+    Ok(())
+}
+
 fn save_application_impl(
     conn: &Connection,
     app: ApplicationInput,
 ) -> CommandResult<Application> {
+    validate_application_input(&app)?;
+
     let id: i64;
     {
         let tx = conn
@@ -306,6 +323,8 @@ fn update_application_impl(
     id: i64,
     app: ApplicationInput,
 ) -> CommandResult<Application> {
+    validate_application_input(&app)?;
+
     let now = chrono::Utc::now().to_rfc3339();
 
     let rows_affected = conn.execute(
@@ -387,6 +406,8 @@ fn add_status_change_impl(
     app_id: i64,
     change: StatusChangeInput,
 ) -> CommandResult<StatusChange> {
+    validate_optional_text_length("Status change notes", &change.notes, 1000)?;
+
     let sc_id: i64;
     {
         let tx = conn

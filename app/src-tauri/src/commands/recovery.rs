@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::AppState;
 
+use super::validation::validate_text_length;
 use super::{CommandError, CommandResult};
 
 // ---------------------------------------------------------------------------
@@ -231,10 +232,30 @@ pub fn save_relapse_entry(
     save_relapse_entry_impl(&db, entry)
 }
 
+fn validate_relapse_input(entry: &RelapseEntryInput) -> CommandResult<()> {
+    validate_text_length("Trigger", &entry.trigger, 500)?;
+    validate_text_length("Location", &entry.location, 500)?;
+    validate_text_length("Device", &entry.device, 500)?;
+    validate_text_length("Activity before", &entry.activity_before, 500)?;
+    validate_text_length("Emotional state", &entry.emotional_state, 500)?;
+    validate_text_length("Resistance technique", &entry.resistance_technique, 500)?;
+    validate_text_length("Notes", &entry.notes, 2000)?;
+    Ok(())
+}
+
+fn validate_urge_input(entry: &UrgeEntryInput) -> CommandResult<()> {
+    validate_text_length("Technique", &entry.technique, 500)?;
+    validate_text_length("Trigger", &entry.trigger, 500)?;
+    validate_text_length("Notes", &entry.notes, 2000)?;
+    Ok(())
+}
+
 fn save_relapse_entry_impl(
     conn: &Connection,
     entry: RelapseEntryInput,
 ) -> CommandResult<RelapseEntry> {
+    validate_relapse_input(&entry)?;
+
     let now = chrono::Utc::now().to_rfc3339();
 
     conn.execute(
@@ -284,6 +305,8 @@ fn update_relapse_entry_impl(
     id: i64,
     entry: RelapseEntryInput,
 ) -> CommandResult<RelapseEntry> {
+    validate_relapse_input(&entry)?;
+
     // Step 1: Fetch existing entry to get created_at for lock check
     let existing = query_relapse_entry_by_id(conn, id)?
         .ok_or_else(|| CommandError::from(format!("Relapse entry with id {} not found", id)))?;
@@ -381,6 +404,8 @@ fn save_urge_entry_impl(
     conn: &Connection,
     entry: UrgeEntryInput,
 ) -> CommandResult<UrgeEntry> {
+    validate_urge_input(&entry)?;
+
     let now = chrono::Utc::now().to_rfc3339();
 
     conn.execute(
@@ -426,6 +451,8 @@ fn update_urge_entry_impl(
     id: i64,
     entry: UrgeEntryInput,
 ) -> CommandResult<UrgeEntry> {
+    validate_urge_input(&entry)?;
+
     // Step 1: Fetch existing entry to get created_at for lock check
     let existing = query_urge_entry_by_id(conn, id)?
         .ok_or_else(|| CommandError::from(format!("Urge entry with id {} not found", id)))?;

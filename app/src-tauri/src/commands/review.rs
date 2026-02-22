@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::AppState;
 
+use super::validation::validate_text_length;
 use super::{CommandError, CommandResult};
 
 // ---------------------------------------------------------------------------
@@ -416,6 +417,11 @@ fn save_weekly_review_impl(
     conn: &Connection,
     review: WeeklyReviewInput,
 ) -> CommandResult<WeeklyReview> {
+    validate_text_length("Biggest win", &review.biggest_win, 8000)?;
+    validate_text_length("Biggest challenge", &review.biggest_challenge, 8000)?;
+    validate_text_length("Next week goal", &review.next_week_goal, 8000)?;
+    validate_text_length("Reflection", &review.reflection, 8000)?;
+
     let now = chrono::Utc::now().to_rfc3339();
     let week_end = compute_week_end(conn, &review.week_start)?;
 

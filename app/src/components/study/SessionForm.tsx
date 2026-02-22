@@ -245,6 +245,7 @@ export default function SessionForm({
             value={form.topic}
             onChange={(e) => setField('topic', e.target.value)}
             placeholder="Specific topic studied"
+            maxLength={500}
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-productivity focus:outline-none focus:ring-1 focus:ring-productivity"
           />
         </label>
@@ -256,6 +257,7 @@ export default function SessionForm({
             value={form.resources}
             onChange={(e) => setField('resources', e.target.value)}
             placeholder="Materials used"
+            maxLength={500}
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-productivity focus:outline-none focus:ring-1 focus:ring-productivity"
           />
         </label>
@@ -269,6 +271,7 @@ export default function SessionForm({
           onChange={(e) => setField('notes', e.target.value)}
           rows={2}
           placeholder="Session notes..."
+          maxLength={2000}
           className="mt-1 block w-full resize-none rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-productivity focus:outline-none focus:ring-1 focus:ring-productivity"
         />
       </label>

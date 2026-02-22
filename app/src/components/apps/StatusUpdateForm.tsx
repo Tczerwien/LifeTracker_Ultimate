@@ -82,6 +82,7 @@ export default function StatusUpdateForm({ appId, onClose }: StatusUpdateFormPro
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Optional notes..."
+            maxLength={1000}
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-productivity focus:outline-none focus:ring-1 focus:ring-productivity"
           />
         </label>

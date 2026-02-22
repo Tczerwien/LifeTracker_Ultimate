@@ -6,6 +6,7 @@ interface JournalTextareaProps {
   value: string;
   onChange: (value: string) => void;
   readOnly?: boolean;
+  maxLength?: number;
 }
 
 export default function JournalTextarea({
@@ -14,6 +15,7 @@ export default function JournalTextarea({
   value,
   onChange,
   readOnly = false,
+  maxLength,
 }: JournalTextareaProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -40,6 +42,7 @@ export default function JournalTextarea({
         placeholder={placeholder}
         value={value}
         readOnly={readOnly}
+        maxLength={maxLength}
         onChange={(e) => {
           if (!readOnly) {
             onChange(e.target.value);

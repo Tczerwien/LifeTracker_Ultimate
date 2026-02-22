@@ -8,6 +8,7 @@ use crate::engine::scoring::{
 };
 use crate::AppState;
 
+use super::validation::validate_text_length;
 use super::{CommandError, CommandResult};
 
 // ---------------------------------------------------------------------------
@@ -531,6 +532,9 @@ pub fn save_daily_log(
     entry: DailyLogInput,
 ) -> CommandResult<DailyLog> {
     let db = state.db.lock().map_err(|_| CommandError::from("DB lock poisoned"))?;
+
+    validate_text_length("Meal quality", &entry.meal_quality, 200)?;
+    validate_text_length("Social", &entry.social, 200)?;
 
     // Run the entire save + cascade within a single transaction
     {

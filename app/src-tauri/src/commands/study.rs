@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::AppState;
 
+use super::validation::validate_text_length;
 use super::{CommandError, CommandResult};
 
 // ---------------------------------------------------------------------------
@@ -125,12 +126,24 @@ pub fn get_study_sessions_range(
         .map_err(CommandError::from)
 }
 
+fn validate_study_session_input(session: &StudySessionInput) -> CommandResult<()> {
+    validate_text_length("Subject", &session.subject, 500)?;
+    validate_text_length("Study type", &session.study_type, 500)?;
+    validate_text_length("Location", &session.location, 500)?;
+    validate_text_length("Topic", &session.topic, 500)?;
+    validate_text_length("Resources", &session.resources, 500)?;
+    validate_text_length("Notes", &session.notes, 2000)?;
+    Ok(())
+}
+
 #[tauri::command]
 pub fn save_study_session(
     state: tauri::State<'_, AppState>,
     session: StudySessionInput,
 ) -> CommandResult<StudySession> {
     let db = state.db.lock().map_err(|_| CommandError::from("DB lock poisoned"))?;
+
+    validate_study_session_input(&session)?;
 
     let now = chrono::Utc::now().to_rfc3339();
 
@@ -169,6 +182,8 @@ pub fn update_study_session(
     session: StudySessionInput,
 ) -> CommandResult<StudySession> {
     let db = state.db.lock().map_err(|_| CommandError::from("DB lock poisoned"))?;
+
+    validate_study_session_input(&session)?;
 
     let now = chrono::Utc::now().to_rfc3339();
 

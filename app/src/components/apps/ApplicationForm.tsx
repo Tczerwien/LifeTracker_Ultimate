@@ -130,6 +130,7 @@ export default function ApplicationForm({
             type="text"
             value={form.company}
             onChange={(e) => setField('company', e.target.value)}
+            maxLength={1000}
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-productivity focus:outline-none focus:ring-1 focus:ring-productivity"
           />
         </label>
@@ -140,6 +141,7 @@ export default function ApplicationForm({
             type="text"
             value={form.role}
             onChange={(e) => setField('role', e.target.value)}
+            maxLength={1000}
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-productivity focus:outline-none focus:ring-1 focus:ring-productivity"
           />
         </label>
@@ -180,6 +182,7 @@ export default function ApplicationForm({
             value={form.url}
             onChange={(e) => setField('url', e.target.value)}
             placeholder="https://..."
+            maxLength={1000}
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-productivity focus:outline-none focus:ring-1 focus:ring-productivity"
           />
         </label>
@@ -191,6 +194,7 @@ export default function ApplicationForm({
             value={form.salary}
             onChange={(e) => setField('salary', e.target.value)}
             placeholder="e.g. $120k-$150k"
+            maxLength={1000}
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-productivity focus:outline-none focus:ring-1 focus:ring-productivity"
           />
         </label>
@@ -204,6 +208,7 @@ export default function ApplicationForm({
             type="text"
             value={form.contact_name}
             onChange={(e) => setField('contact_name', e.target.value)}
+            maxLength={1000}
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-productivity focus:outline-none focus:ring-1 focus:ring-productivity"
           />
         </label>
@@ -214,6 +219,7 @@ export default function ApplicationForm({
             type="email"
             value={form.contact_email}
             onChange={(e) => setField('contact_email', e.target.value)}
+            maxLength={1000}
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-productivity focus:outline-none focus:ring-1 focus:ring-productivity"
           />
         </label>
@@ -237,6 +243,7 @@ export default function ApplicationForm({
             type="text"
             value={form.login_username}
             onChange={(e) => setField('login_username', e.target.value)}
+            maxLength={500}
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-productivity focus:outline-none focus:ring-1 focus:ring-productivity"
           />
         </label>
@@ -247,6 +254,7 @@ export default function ApplicationForm({
             type="password"
             value={form.login_password}
             onChange={(e) => setField('login_password', e.target.value)}
+            maxLength={500}
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-productivity focus:outline-none focus:ring-1 focus:ring-productivity"
           />
         </label>
@@ -260,6 +268,7 @@ export default function ApplicationForm({
           onChange={(e) => setField('notes', e.target.value)}
           rows={2}
           placeholder="Application notes..."
+          maxLength={1000}
           className="mt-1 block w-full resize-none rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-productivity focus:outline-none focus:ring-1 focus:ring-productivity"
         />
       </label>

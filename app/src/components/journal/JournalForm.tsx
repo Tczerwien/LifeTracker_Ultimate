@@ -166,22 +166,26 @@ export default function JournalForm({ date, journal }: JournalFormProps) {
         placeholder="What went well today?"
         value={formState.highlight}
         onChange={(v) => setField('highlight', v)}
+        maxLength={8000}
       />
       <JournalTextarea
         label="Gratitude"
         placeholder="What are you grateful for?"
         value={formState.gratitude}
         onChange={(v) => setField('gratitude', v)}
+        maxLength={8000}
       />
       <JournalTextarea
         label="Reflection"
         value={formState.reflection}
         onChange={(v) => setField('reflection', v)}
+        maxLength={8000}
       />
       <JournalTextarea
         label="Tomorrow's Goal"
         value={formState.tomorrow_goal}
         onChange={(v) => setField('tomorrow_goal', v)}
+        maxLength={8000}
       />
 
       {/* Save button */}

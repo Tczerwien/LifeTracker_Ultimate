@@ -10,6 +10,7 @@ pub mod recovery;
 pub mod review;
 pub mod study;
 pub mod testdata;
+pub mod validation;
 
 // ---------------------------------------------------------------------------
 // Shared Error Type for Tauri Commands

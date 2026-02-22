@@ -184,6 +184,7 @@ export default function UrgeForm({
             value={form.trigger}
             onChange={(e) => setField('trigger', e.target.value)}
             placeholder="What triggered the urge?"
+            maxLength={500}
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500"
           />
         </label>
@@ -261,6 +262,7 @@ export default function UrgeForm({
           onChange={(e) => setField('notes', e.target.value)}
           rows={2}
           placeholder="Additional context..."
+          maxLength={2000}
           className="mt-1 block w-full resize-none rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500"
         />
       </label>

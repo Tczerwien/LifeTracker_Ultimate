@@ -384,6 +384,7 @@ export default function WeeklyReviewForm({
             onChange={(v) => setField('biggest_win', v)}
             placeholder="What went best this week?"
             readOnly={isSaved}
+            maxLength={8000}
           />
           <JournalTextarea
             label="Biggest Challenge"
@@ -391,6 +392,7 @@ export default function WeeklyReviewForm({
             onChange={(v) => setField('biggest_challenge', v)}
             placeholder="What was hardest?"
             readOnly={isSaved}
+            maxLength={8000}
           />
           <JournalTextarea
             label="Next Week Goal"
@@ -398,6 +400,7 @@ export default function WeeklyReviewForm({
             onChange={(v) => setField('next_week_goal', v)}
             placeholder="One concrete goal for next week"
             readOnly={isSaved}
+            maxLength={8000}
           />
           <JournalTextarea
             label="Reflection"
@@ -405,6 +408,7 @@ export default function WeeklyReviewForm({
             onChange={(v) => setField('reflection', v)}
             placeholder="Free-form thoughts on the week"
             readOnly={isSaved}
+            maxLength={8000}
           />
         </div>
       </div>
