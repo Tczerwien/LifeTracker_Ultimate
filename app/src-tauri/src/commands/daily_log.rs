@@ -118,7 +118,6 @@ pub(crate) struct HabitConfigRow {
 // ---------------------------------------------------------------------------
 
 /// Column list used in all daily_log SELECT queries.
-/// Order must match positional indices in `row_to_daily_log`.
 pub const DAILY_LOG_COLUMNS: &str = "\
     id, date, \
     schoolwork, personal_project, classes, job_search, \
@@ -132,41 +131,40 @@ pub const DAILY_LOG_COLUMNS: &str = "\
 // Row Mapper
 // ---------------------------------------------------------------------------
 
-/// Maps a rusqlite Row to a DailyLog struct using positional indices.
-/// Column order must match `DAILY_LOG_COLUMNS`.
+/// Maps a rusqlite Row to a DailyLog struct using column names.
 pub fn row_to_daily_log(row: &rusqlite::Row) -> rusqlite::Result<DailyLog> {
     Ok(DailyLog {
-        id: row.get(0)?,
-        date: row.get(1)?,
-        schoolwork: row.get(2)?,
-        personal_project: row.get(3)?,
-        classes: row.get(4)?,
-        job_search: row.get(5)?,
-        gym: row.get(6)?,
-        sleep_7_9h: row.get(7)?,
-        wake_8am: row.get(8)?,
-        supplements: row.get(9)?,
-        meal_quality: row.get(10)?,
-        stretching: row.get(11)?,
-        meditate: row.get(12)?,
-        read: row.get(13)?,
-        social: row.get(14)?,
-        porn: row.get(15)?,
-        masturbate: row.get(16)?,
-        weed: row.get(17)?,
-        skip_class: row.get(18)?,
-        binged_content: row.get(19)?,
-        gaming_1h: row.get(20)?,
-        past_12am: row.get(21)?,
-        late_wake: row.get(22)?,
-        phone_use: row.get(23)?,
-        positive_score: row.get(24)?,
-        vice_penalty: row.get(25)?,
-        base_score: row.get(26)?,
-        streak: row.get(27)?,
-        final_score: row.get(28)?,
-        logged_at: row.get(29)?,
-        last_modified: row.get(30)?,
+        id: row.get("id")?,
+        date: row.get("date")?,
+        schoolwork: row.get("schoolwork")?,
+        personal_project: row.get("personal_project")?,
+        classes: row.get("classes")?,
+        job_search: row.get("job_search")?,
+        gym: row.get("gym")?,
+        sleep_7_9h: row.get("sleep_7_9h")?,
+        wake_8am: row.get("wake_8am")?,
+        supplements: row.get("supplements")?,
+        meal_quality: row.get("meal_quality")?,
+        stretching: row.get("stretching")?,
+        meditate: row.get("meditate")?,
+        read: row.get("read")?,
+        social: row.get("social")?,
+        porn: row.get("porn")?,
+        masturbate: row.get("masturbate")?,
+        weed: row.get("weed")?,
+        skip_class: row.get("skip_class")?,
+        binged_content: row.get("binged_content")?,
+        gaming_1h: row.get("gaming_1h")?,
+        past_12am: row.get("past_12am")?,
+        late_wake: row.get("late_wake")?,
+        phone_use: row.get("phone_use")?,
+        positive_score: row.get("positive_score")?,
+        vice_penalty: row.get("vice_penalty")?,
+        base_score: row.get("base_score")?,
+        streak: row.get("streak")?,
+        final_score: row.get("final_score")?,
+        logged_at: row.get("logged_at")?,
+        last_modified: row.get("last_modified")?,
     })
 }
 
@@ -261,21 +259,21 @@ pub(crate) fn load_scoring_config(conn: &Connection) -> CommandResult<ScoringCon
         [],
         |row| {
             Ok(ScoringConfig {
-                multiplier_productivity: row.get(0)?,
-                multiplier_health: row.get(1)?,
-                multiplier_growth: row.get(2)?,
-                target_fraction: row.get(3)?,
-                vice_cap: row.get(4)?,
-                streak_threshold: row.get(5)?,
-                streak_bonus_per_day: row.get(6)?,
-                max_streak_bonus: row.get(7)?,
+                multiplier_productivity: row.get("multiplier_productivity")?,
+                multiplier_health: row.get("multiplier_health")?,
+                multiplier_growth: row.get("multiplier_growth")?,
+                target_fraction: row.get("target_fraction")?,
+                vice_cap: row.get("vice_cap")?,
+                streak_threshold: row.get("streak_threshold")?,
+                streak_bonus_per_day: row.get("streak_bonus_per_day")?,
+                max_streak_bonus: row.get("max_streak_bonus")?,
                 // phone_t*_min are INTEGER in DB but f64 in ScoringConfig
-                phone_t1_min: row.get::<_, i64>(8)? as f64,
-                phone_t2_min: row.get::<_, i64>(9)? as f64,
-                phone_t3_min: row.get::<_, i64>(10)? as f64,
-                phone_t1_penalty: row.get(11)?,
-                phone_t2_penalty: row.get(12)?,
-                phone_t3_penalty: row.get(13)?,
+                phone_t1_min: row.get::<_, i64>("phone_t1_min")? as f64,
+                phone_t2_min: row.get::<_, i64>("phone_t2_min")? as f64,
+                phone_t3_min: row.get::<_, i64>("phone_t3_min")? as f64,
+                phone_t1_penalty: row.get("phone_t1_penalty")?,
+                phone_t2_penalty: row.get("phone_t2_penalty")?,
+                phone_t3_penalty: row.get("phone_t3_penalty")?,
             })
         },
     )
@@ -293,15 +291,15 @@ pub(crate) fn load_active_habit_configs(conn: &Connection) -> CommandResult<Vec<
 
     let rows = stmt.query_map([], |row| {
         Ok(HabitConfigRow {
-            name: row.get(0)?,
-            pool: row.get(1)?,
-            category: row.get(2)?,
-            input_type: row.get(3)?,
-            points: row.get(4)?,
-            penalty: row.get(5)?,
-            penalty_mode: row.get(6)?,
-            options_json: row.get(7)?,
-            column_name: row.get(8)?,
+            name: row.get("name")?,
+            pool: row.get("pool")?,
+            category: row.get("category")?,
+            input_type: row.get("input_type")?,
+            points: row.get("points")?,
+            penalty: row.get("penalty")?,
+            penalty_mode: row.get("penalty_mode")?,
+            options_json: row.get("options_json")?,
+            column_name: row.get("column_name")?,
         })
     })?;
 
@@ -325,10 +323,10 @@ fn load_subsequent_days(
 
     let rows = stmt.query_map([date], |row| {
         Ok((
-            row.get::<_, String>(0)?,
-            row.get::<_, f64>(1)?,
-            row.get::<_, i32>(2)?,
-            row.get::<_, f64>(3)?,
+            row.get::<_, String>("date")?,
+            row.get::<_, f64>("base_score")?,
+            row.get::<_, i32>("streak")?,
+            row.get::<_, f64>("final_score")?,
         ))
     })?;
 
@@ -543,7 +541,7 @@ pub fn save_daily_log(
             .query_row(
                 "SELECT id, logged_at FROM daily_log WHERE date = ?1",
                 [&entry.date],
-                |row| Ok((row.get(0)?, row.get(1)?)),
+                |row| Ok((row.get("id")?, row.get("logged_at")?)),
             )
             .optional()?;
 
@@ -1212,7 +1210,7 @@ mod tests {
                 .query_row(
                     "SELECT id, logged_at FROM daily_log WHERE date = ?1",
                     [&entry.date],
-                    |row| Ok((row.get(0)?, row.get(1)?)),
+                    |row| Ok((row.get("id")?, row.get("logged_at")?)),
                 )
                 .optional()?;
 

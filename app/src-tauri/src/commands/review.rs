@@ -88,28 +88,28 @@ const WEEKLY_REVIEW_COLUMNS: &str = "\
 
 fn row_to_weekly_review(row: &rusqlite::Row) -> rusqlite::Result<WeeklyReview> {
     Ok(WeeklyReview {
-        id: row.get(0)?,
-        week_start: row.get(1)?,
-        week_end: row.get(2)?,
-        week_number: row.get(3)?,
-        avg_score: row.get(4)?,
-        days_tracked: row.get(5)?,
-        best_day_score: row.get(6)?,
-        worst_day_score: row.get(7)?,
-        habits_completed: row.get(8)?,
-        study_hours: row.get(9)?,
-        applications_sent: row.get(10)?,
-        relapses: row.get(11)?,
-        urges_resisted: row.get(12)?,
-        streak_at_end: row.get(13)?,
-        biggest_win: row.get(14)?,
-        biggest_challenge: row.get(15)?,
-        next_week_goal: row.get(16)?,
-        reflection: row.get(17)?,
-        snapshot_date: row.get(18)?,
-        score_snapshot: row.get(19)?,
-        logged_at: row.get(20)?,
-        last_modified: row.get(21)?,
+        id: row.get("id")?,
+        week_start: row.get("week_start")?,
+        week_end: row.get("week_end")?,
+        week_number: row.get("week_number")?,
+        avg_score: row.get("avg_score")?,
+        days_tracked: row.get("days_tracked")?,
+        best_day_score: row.get("best_day_score")?,
+        worst_day_score: row.get("worst_day_score")?,
+        habits_completed: row.get("habits_completed")?,
+        study_hours: row.get("study_hours")?,
+        applications_sent: row.get("applications_sent")?,
+        relapses: row.get("relapses")?,
+        urges_resisted: row.get("urges_resisted")?,
+        streak_at_end: row.get("streak_at_end")?,
+        biggest_win: row.get("biggest_win")?,
+        biggest_challenge: row.get("biggest_challenge")?,
+        next_week_goal: row.get("next_week_goal")?,
+        reflection: row.get("reflection")?,
+        snapshot_date: row.get("snapshot_date")?,
+        score_snapshot: row.get("score_snapshot")?,
+        logged_at: row.get("logged_at")?,
+        last_modified: row.get("last_modified")?,
     })
 }
 
@@ -155,10 +155,11 @@ fn compute_weekly_stats_impl(
         i64,
     ) = conn
         .query_row(
-            "SELECT AVG(final_score), MIN(final_score), MAX(final_score), COUNT(*) \
+            "SELECT AVG(final_score) AS avg_score, MIN(final_score) AS min_score, \
+             MAX(final_score) AS max_score, COUNT(*) AS day_count \
              FROM daily_log WHERE date >= ?1 AND date <= ?2 AND final_score IS NOT NULL",
             params![week_start, week_end],
-            |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?)),
+            |row| Ok((row.get("avg_score")?, row.get("min_score")?, row.get("max_score")?, row.get("day_count")?)),
         )
         .map_err(CommandError::from)?;
 
@@ -242,7 +243,7 @@ fn compute_habits_completed(
          WHERE pool = 'good' AND is_active = 1",
     )?;
     let habits: Vec<(String, String)> = stmt
-        .query_map([], |row| Ok((row.get(0)?, row.get(1)?)))?
+        .query_map([], |row| Ok((row.get("column_name")?, row.get("input_type")?)))?
         .collect::<Result<Vec<_>, _>>()
         .map_err(CommandError::from)?;
 
@@ -298,7 +299,7 @@ fn build_score_snapshot(
     )?;
     let rows: Vec<(String, Option<f64>)> = stmt
         .query_map(params![week_start, week_end], |row| {
-            Ok((row.get(0)?, row.get(1)?))
+            Ok((row.get("date")?, row.get("final_score")?))
         })?
         .collect::<Result<Vec<_>, _>>()
         .map_err(CommandError::from)?;
@@ -436,7 +437,7 @@ fn save_weekly_review_impl(
             .query_row(
                 "SELECT id, logged_at FROM weekly_review WHERE week_start = ?1",
                 [&review.week_start],
-                |row| Ok((row.get(0)?, row.get(1)?)),
+                |row| Ok((row.get("id")?, row.get("logged_at")?)),
             )
             .optional()?;
 

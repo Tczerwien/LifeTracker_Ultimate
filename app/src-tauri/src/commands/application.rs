@@ -105,34 +105,34 @@ const STATUS_CHANGE_COLUMNS: &str = "\
 
 fn row_to_application(row: &rusqlite::Row) -> rusqlite::Result<Application> {
     Ok(Application {
-        id: row.get(0)?,
-        date_applied: row.get(1)?,
-        company: row.get(2)?,
-        role: row.get(3)?,
-        source: row.get(4)?,
-        current_status: row.get(5)?,
-        url: row.get(6)?,
-        notes: row.get(7)?,
-        follow_up_date: row.get(8)?,
-        salary: row.get(9)?,
-        contact_name: row.get(10)?,
-        contact_email: row.get(11)?,
-        login_username: row.get(12)?,
-        login_password: row.get(13)?,
-        archived: row.get(14)?,
-        logged_at: row.get(15)?,
-        last_modified: row.get(16)?,
+        id: row.get("id")?,
+        date_applied: row.get("date_applied")?,
+        company: row.get("company")?,
+        role: row.get("role")?,
+        source: row.get("source")?,
+        current_status: row.get("current_status")?,
+        url: row.get("url")?,
+        notes: row.get("notes")?,
+        follow_up_date: row.get("follow_up_date")?,
+        salary: row.get("salary")?,
+        contact_name: row.get("contact_name")?,
+        contact_email: row.get("contact_email")?,
+        login_username: row.get("login_username")?,
+        login_password: row.get("login_password")?,
+        archived: row.get("archived")?,
+        logged_at: row.get("logged_at")?,
+        last_modified: row.get("last_modified")?,
     })
 }
 
 fn row_to_status_change(row: &rusqlite::Row) -> rusqlite::Result<StatusChange> {
     Ok(StatusChange {
-        id: row.get(0)?,
-        application_id: row.get(1)?,
-        status: row.get(2)?,
-        date: row.get(3)?,
-        notes: row.get(4)?,
-        created_at: row.get(5)?,
+        id: row.get("id")?,
+        application_id: row.get("application_id")?,
+        status: row.get("status")?,
+        date: row.get("date")?,
+        notes: row.get("notes")?,
+        created_at: row.get("created_at")?,
     })
 }
 

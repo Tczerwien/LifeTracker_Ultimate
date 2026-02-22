@@ -46,14 +46,14 @@ const MILESTONE_COLUMNS: &str = "\
 
 fn row_to_milestone(row: &rusqlite::Row) -> rusqlite::Result<Milestone> {
     Ok(Milestone {
-        id: row.get(0)?,
-        name: row.get(1)?,
-        emoji: row.get(2)?,
-        category: row.get(3)?,
-        threshold: row.get(4)?,
-        achieved: row.get(5)?,
-        achieved_date: row.get(6)?,
-        created_at: row.get(7)?,
+        id: row.get("id")?,
+        name: row.get("name")?,
+        emoji: row.get("emoji")?,
+        category: row.get("category")?,
+        threshold: row.get("threshold")?,
+        achieved: row.get("achieved")?,
+        achieved_date: row.get("achieved_date")?,
+        created_at: row.get("created_at")?,
     })
 }
 
@@ -178,7 +178,7 @@ fn compute_consecutive_clean_days(conn: &Connection) -> CommandResult<i64> {
         "SELECT date, porn, masturbate FROM daily_log ORDER BY date DESC",
     )?;
     let rows: Vec<(String, i64, i64)> = stmt
-        .query_map([], |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)))?
+        .query_map([], |row| Ok((row.get("date")?, row.get("porn")?, row.get("masturbate")?)))?
         .collect::<Result<Vec<_>, _>>()
         .map_err(CommandError::from)?;
 

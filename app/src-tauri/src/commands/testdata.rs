@@ -699,10 +699,10 @@ pub(crate) fn generate_test_data_impl(conn: &Connection) -> CommandResult<TestDa
         // Compute actual stats from the data we just inserted
         let (avg_score, days_tracked, best_day, worst_day): (Option<f64>, i64, Option<f64>, Option<f64>) = tx
             .query_row(
-                "SELECT AVG(final_score), COUNT(*), MAX(final_score), MIN(final_score) \
+                "SELECT AVG(final_score) AS avg_score, COUNT(*) AS day_count, MAX(final_score) AS max_score, MIN(final_score) AS min_score \
                  FROM daily_log WHERE date >= ?1 AND date <= ?2 AND final_score IS NOT NULL",
                 params![ws, we],
-                |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?)),
+                |row| Ok((row.get("avg_score")?, row.get("day_count")?, row.get("max_score")?, row.get("min_score")?)),
             )
             .map_err(CommandError::from)?;
 
@@ -897,10 +897,10 @@ mod tests {
         // Verify score distribution is realistic (not all 0 or all 1)
         let (avg, min, max): (f64, f64, f64) = conn
             .query_row(
-                "SELECT AVG(final_score), MIN(final_score), MAX(final_score) \
+                "SELECT AVG(final_score) AS avg_score, MIN(final_score) AS min_score, MAX(final_score) AS max_score \
                  FROM daily_log WHERE final_score IS NOT NULL",
                 [],
-                |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)),
+                |row| Ok((row.get("avg_score")?, row.get("min_score")?, row.get("max_score")?)),
             )
             .unwrap();
         assert!(avg > 0.3 && avg < 0.9,

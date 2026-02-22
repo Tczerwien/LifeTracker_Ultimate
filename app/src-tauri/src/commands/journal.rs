@@ -48,16 +48,16 @@ const JOURNAL_COLUMNS: &str = "\
 
 fn row_to_journal(row: &rusqlite::Row) -> rusqlite::Result<Journal> {
     Ok(Journal {
-        id: row.get(0)?,
-        date: row.get(1)?,
-        mood: row.get(2)?,
-        energy: row.get(3)?,
-        highlight: row.get(4)?,
-        gratitude: row.get(5)?,
-        reflection: row.get(6)?,
-        tomorrow_goal: row.get(7)?,
-        logged_at: row.get(8)?,
-        last_modified: row.get(9)?,
+        id: row.get("id")?,
+        date: row.get("date")?,
+        mood: row.get("mood")?,
+        energy: row.get("energy")?,
+        highlight: row.get("highlight")?,
+        gratitude: row.get("gratitude")?,
+        reflection: row.get("reflection")?,
+        tomorrow_goal: row.get("tomorrow_goal")?,
+        logged_at: row.get("logged_at")?,
+        last_modified: row.get("last_modified")?,
     })
 }
 
@@ -100,7 +100,7 @@ pub fn save_journal(
             .query_row(
                 "SELECT id, logged_at FROM journal WHERE date = ?1",
                 [&entry.date],
-                |row| Ok((row.get(0)?, row.get(1)?)),
+                |row| Ok((row.get("id")?, row.get("logged_at")?)),
             )
             .optional()?;
 
@@ -194,7 +194,7 @@ mod tests {
                 .query_row(
                     "SELECT id, logged_at FROM journal WHERE date = ?1",
                     [&entry.date],
-                    |row| Ok((row.get(0)?, row.get(1)?)),
+                    |row| Ok((row.get("id")?, row.get("logged_at")?)),
                 )
                 .optional()?;
 

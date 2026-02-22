@@ -141,7 +141,7 @@ pub(crate) fn get_score_trend_impl(
          ORDER BY date ASC",
     )?;
     let raw: Vec<(String, f64)> = stmt
-        .query_map(params![start, end], |row| Ok((row.get(0)?, row.get(1)?)))?
+        .query_map(params![start, end], |row| Ok((row.get("date")?, row.get("final_score")?)))?
         .collect::<Result<Vec<_>, _>>()
         .map_err(CommandError::from)?;
 
@@ -190,11 +190,11 @@ pub(crate) fn get_habit_completion_rates_impl(
     let habits: Vec<(String, String, String, String, String)> = stmt
         .query_map([], |row| {
             Ok((
-                row.get(0)?,
-                row.get(1)?,
-                row.get(2)?,
-                row.get(3)?,
-                row.get(4)?,
+                row.get("name")?,
+                row.get("display_name")?,
+                row.get("category")?,
+                row.get("column_name")?,
+                row.get("input_type")?,
             ))
         })?
         .collect::<Result<Vec<_>, _>>()
@@ -270,7 +270,7 @@ pub(crate) fn get_vice_frequency_impl(
          ORDER BY sort_order ASC",
     )?;
     let vices: Vec<(String, String, String)> = stmt
-        .query_map([], |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)))?
+        .query_map([], |row| Ok((row.get("name")?, row.get("display_name")?, row.get("column_name")?)))?
         .collect::<Result<Vec<_>, _>>()
         .map_err(CommandError::from)?;
 
@@ -331,9 +331,9 @@ pub(crate) fn get_day_of_week_averages_impl(
     let rows = stmt
         .query_map(params![start, end], |row| {
             Ok(DayOfWeekAvg {
-                day: row.get(0)?,
-                avg_score: row.get(1)?,
-                count: row.get(2)?,
+                day: row.get("day_idx")?,
+                avg_score: row.get("avg_score")?,
+                count: row.get("count")?,
             })
         })?
         .collect::<Result<Vec<_>, _>>()
@@ -368,12 +368,12 @@ pub(crate) fn get_study_summary_impl(
     // Aggregate stats
     let (session_count, total_hours, avg_focus): (i64, f64, f64) = conn
         .query_row(
-            "SELECT COUNT(*), \
-                    COALESCE(SUM(duration_minutes), 0) / 60.0, \
-                    COALESCE(AVG(focus_score), 0.0) \
+            "SELECT COUNT(*) AS session_count, \
+                    COALESCE(SUM(duration_minutes), 0) / 60.0 AS total_hours, \
+                    COALESCE(AVG(focus_score), 0.0) AS avg_focus \
              FROM study_session WHERE date >= ?1 AND date <= ?2",
             params![start, end],
-            |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)),
+            |row| Ok((row.get("session_count")?, row.get("total_hours")?, row.get("avg_focus")?)),
         )
         .map_err(CommandError::from)?;
 
@@ -386,8 +386,8 @@ pub(crate) fn get_study_summary_impl(
     let hours_by_subject: Vec<SubjectHours> = stmt
         .query_map(params![start, end], |row| {
             Ok(SubjectHours {
-                subject: row.get(0)?,
-                hours: row.get(1)?,
+                subject: row.get("subject")?,
+                hours: row.get("hours")?,
             })
         })?
         .collect::<Result<Vec<_>, _>>()
@@ -403,7 +403,7 @@ pub(crate) fn get_study_summary_impl(
 
 pub(crate) fn get_application_pipeline_impl(conn: &Connection) -> CommandResult<PipelineSummary> {
     let mut stmt = conn.prepare(
-        "SELECT current_status, COUNT(*) FROM application \
+        "SELECT current_status, COUNT(*) AS count FROM application \
          WHERE archived = 0 \
          GROUP BY current_status \
          ORDER BY CASE current_status \
@@ -420,8 +420,8 @@ pub(crate) fn get_application_pipeline_impl(conn: &Connection) -> CommandResult<
     let stages: Vec<PipelineStage> = stmt
         .query_map([], |row| {
             Ok(PipelineStage {
-                status: row.get(0)?,
-                count: row.get(1)?,
+                status: row.get("current_status")?,
+                count: row.get("count")?,
             })
         })?
         .collect::<Result<Vec<_>, _>>()
@@ -463,12 +463,12 @@ pub(crate) fn get_recovery_frequency_impl(
 
     // Weekly breakdown — relapses
     let mut relapse_stmt = conn.prepare(
-        "SELECT date(date, 'weekday 0', '-6 days') AS week_start, COUNT(*) \
+        "SELECT date(date, 'weekday 0', '-6 days') AS week_start, COUNT(*) AS count \
          FROM relapse_entry WHERE date >= ?1 AND date <= ?2 \
          GROUP BY week_start ORDER BY week_start",
     )?;
     let relapse_weeks: Vec<(String, i64)> = relapse_stmt
-        .query_map(params![start, end], |row| Ok((row.get(0)?, row.get(1)?)))?
+        .query_map(params![start, end], |row| Ok((row.get("week_start")?, row.get("count")?)))?
         .collect::<Result<Vec<_>, _>>()
         .map_err(CommandError::from)?;
 
@@ -482,7 +482,7 @@ pub(crate) fn get_recovery_frequency_impl(
     )?;
     let urge_weeks: Vec<(String, i64, i64)> = urge_stmt
         .query_map(params![start, end], |row| {
-            Ok((row.get(0)?, row.get(1)?, row.get(2)?))
+            Ok((row.get("week_start")?, row.get("urges")?, row.get("resisted")?))
         })?
         .collect::<Result<Vec<_>, _>>()
         .map_err(CommandError::from)?;

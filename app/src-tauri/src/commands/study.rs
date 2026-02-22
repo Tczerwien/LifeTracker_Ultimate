@@ -57,20 +57,20 @@ const STUDY_SESSION_COLUMNS: &str = "\
 
 fn row_to_study_session(row: &rusqlite::Row) -> rusqlite::Result<StudySession> {
     Ok(StudySession {
-        id: row.get(0)?,
-        date: row.get(1)?,
-        subject: row.get(2)?,
-        study_type: row.get(3)?,
-        start_time: row.get(4)?,
-        end_time: row.get(5)?,
-        duration_minutes: row.get(6)?,
-        focus_score: row.get(7)?,
-        location: row.get(8)?,
-        topic: row.get(9)?,
-        resources: row.get(10)?,
-        notes: row.get(11)?,
-        logged_at: row.get(12)?,
-        last_modified: row.get(13)?,
+        id: row.get("id")?,
+        date: row.get("date")?,
+        subject: row.get("subject")?,
+        study_type: row.get("study_type")?,
+        start_time: row.get("start_time")?,
+        end_time: row.get("end_time")?,
+        duration_minutes: row.get("duration_minutes")?,
+        focus_score: row.get("focus_score")?,
+        location: row.get("location")?,
+        topic: row.get("topic")?,
+        resources: row.get("resources")?,
+        notes: row.get("notes")?,
+        logged_at: row.get("logged_at")?,
+        last_modified: row.get("last_modified")?,
     })
 }
 
