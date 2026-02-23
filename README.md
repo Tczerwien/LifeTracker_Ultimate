@@ -43,6 +43,16 @@ Over time, the analytics dashboard reveals which habits correlate with your best
 
 **Milestone System** — Achievement badges for streaks, clean days, study hours, and application milestones. One-way flip — once earned, never reversed.
 
+## Privacy & Data
+
+Life Tracker Ultimate is a **fully local application**. All data is stored on your device in a SQLite database and never transmitted to any server or third party.
+
+- **Database location:** `[platform data dir]/life-tracker-ultimate/ltu.db`
+- **Automatic backups:** 7 rolling backups stored alongside the database
+- **No telemetry:** The app makes zero network requests
+- **No accounts:** No sign-up, no cloud sync, no external dependencies
+- **Sensitive data:** The job application tracker stores credentials in plaintext in the local database. Your data is protected by your operating system's user account and disk encryption — treat the database file as you would a password manager vault.
+
 ## Tech Stack
 
 | Layer | Technology |
